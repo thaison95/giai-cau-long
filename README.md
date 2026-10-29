@@ -68,6 +68,11 @@ Client-side variables must be prefixed with `VITE_`. Put them in `.env.local` (g
 | `bun run lint` / `bun run format` | Biome lint / format only |
 | `bun run generate-routes` | Regenerate `src/routeTree.gen.ts` (do not edit that file by hand) |
 | `bun run deploy` | Build and deploy to Cloudflare Pages |
+| `bun run test:db` | Run pgTAP tests and a 12-call concurrent scoring check (requires `bunx supabase start`) |
+
+## Supabase database
+
+Link the local CLI to the project once with `bunx supabase login` and `bunx supabase link --project-ref <project-ref>`. Push migrations with `bunx supabase db push --linked`. Start the local stack and apply migrations with `bunx supabase start`; run database tests with `bun run test:db`. Regenerate the committed database types with `bunx supabase gen types --linked --schema public > src/lib/database.types.ts`.
 
 Add a shadcn component with `bunx shadcn@latest add <name>`. This preset uses Base UI, which has no `asChild`; use the `render` prop instead.
 
@@ -94,7 +99,7 @@ docs/                design, database and ticket documents
 src/routes/          file-based routes (TanStack Router)
 src/integrations/    TanStack Query setup
 src/components/ui/   shadcn components (project source, safe to edit)
-supabase/            migrations and SQL tests (to be added)
+supabase/            migrations and SQL tests
 ```
 
 `src/routes/demo`, `about.tsx`, and the Header/Footer content are leftovers from the starter and will be replaced (see ticket M0-4).

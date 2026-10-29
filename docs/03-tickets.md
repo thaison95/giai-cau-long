@@ -33,34 +33,34 @@ M0 và M1 làm song song được (UI và database độc lập).
 
 ## M0 — Nền tảng
 
-### M0-1 Cài shadcn preset và dọn styles (S)
+### M0-1 Cài shadcn preset và dọn styles (S) — ✅ Hoàn thành
 - **Việc:** chạy `bunx shadcn@latest init --preset b3DpidP3hY`; dọn `src/styles.css` (xóa Google Fonts, biến cũ của starter); kiểm tra `button.tsx` import `cn` từ `@/lib/utils` và gỡ gói `cn` nếu bị thêm.
 - **Nghiệm thu:** `components.json` có `style: base-lyra`; `styles.css` chỉ còn token preset; font Inter và JetBrains Mono tải từ `@fontsource-variable`; không còn request tới Google Fonts; chuyển sáng/tối hoạt động.
 - **Tham chiếu:** 02 §0.1, §0.2.
 
-### M0-2 Token nghiệp vụ và biến thể kích thước (S)
+### M0-2 Token nghiệp vụ và biến thể kích thước (S) — ✅ Hoàn thành
 - **Phụ thuộc:** M0-1.
 - **Việc:** thêm token `team-a, team-b, live, win, warning` (sáng/tối) và đăng ký trong `@theme inline`; thêm size `touch` và `xl` cho `Button`, biến thể `live/win/warning` cho `Badge`; ô nhập `h-11 text-base md:h-8 md:text-xs` cho trang công khai/trọng tài.
 - **Nghiệm thu:** tạo trang thử (route tạm, xóa sau) hiển thị đủ biến thể ở cả hai theme; vùng chạm ≥ 44px; tương phản chữ/nền ≥ 4.5:1.
 - **Tham chiếu:** 02 §2.2, §2.4.
 
-### M0-3 Cài các component shadcn (S)
+### M0-3 Cài các component shadcn (S) — ✅ Hoàn thành
 - **Phụ thuộc:** M0-1.
 - **Việc:** `bunx shadcn@latest add` toàn bộ danh sách ở 02 §3.1; đọc từng file trước khi dùng.
 - **Nghiệm thu:** build qua; không component nào dùng `asChild`.
 
-### M0-4 Dọn demo của starter và dựng khung layout (M)
+### M0-4 Dọn demo của starter và dựng khung layout (M) — ✅ Hoàn thành
 - **Phụ thuộc:** M0-2, M0-3.
 - **Việc:** xóa `src/routes/demo`, `about.tsx`, nội dung demo của Header/Footer; dựng 3 route layout rỗng: công khai (`/`), trọng tài (`/r`), quản trị (`/admin`); trang 404 thân thiện; nút đổi sáng/tối viết lại theo token mới; giữ `THEME_INIT_SCRIPT` hoặc tương đương để không bị nháy theme.
 - **Nghiệm thu:** `bun run generate-routes` sinh đúng cây route; không còn tham chiếu tới file demo; 404 hiển thị đúng.
 - **Tham chiếu:** 02 §4.
 
-### M0-5 Supabase client và biến môi trường (S)
+### M0-5 Supabase client và biến môi trường (S) — ✅ Hoàn thành
 - **Việc:** cài `@supabase/supabase-js`; tạo `src/lib/supabase.ts` (chỉ dùng anon key); thêm `.env.example` với `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`; kiểm tra `.env.local` đã gitignore.
 - **Nghiệm thu:** thiếu biến môi trường thì app báo lỗi rõ ràng lúc khởi động; tìm trong repo không có `service_role`.
 - **Tham chiếu:** AGENTS.md (Kiến trúc, Biến môi trường).
 
-### M0-6 Deploy thử lên Cloudflare Pages (S)
+### M0-6 Deploy thử lên Cloudflare Pages (S) — ✅ Hoàn thành
 - **Phụ thuộc:** M0-4.
 - **Việc:** `wrangler pages project create giaicaulong` và `bun run deploy` (hoặc Git integration); đặt biến môi trường trên Pages; kiểm tra fallback SPA (mở thẳng route sâu như `/admin` không bị 404).
 - **Nghiệm thu:** URL Pages mở được; refresh ở route bất kỳ vẫn ra app.
@@ -72,47 +72,47 @@ M0 và M1 làm song song được (UI và database độc lập).
 
 > Làm theo thứ tự migration ở 01 §8. Mỗi ticket là một hoặc vài file migration trong `supabase/migrations/`. Không sửa trực tiếp trên dashboard.
 
-### M1-1 Khởi tạo Supabase CLI và project (S)
+### M1-1 Khởi tạo Supabase CLI và project (S) — ✅ CLI linked, Email provider bật, Site URL/Redirect URLs đã xác nhận
 - **Việc:** tạo project Supabase; `supabase init` và `supabase link`; bật Auth email (magic link); cấu hình Site URL và Redirect URL cho `localhost:3000` và domain Pages.
 - **Nghiệm thu:** `supabase db push` chạy được với migration rỗng; magic link gửi được.
 - **Lưu ý:** cần người dùng tạo project Supabase và cung cấp quyền; nếu chưa có, dừng và báo.
 
-### M1-2 Enum và các bảng (M)
+### M1-2 Enum và các bảng (M) — ✅ Migration reset sạch local và áp dụng trên project
 - **Phụ thuộc:** M1-1.
 - **Việc:** tạo toàn bộ enum (01 §2) và bảng (01 §3.1–3.11) gồm khóa, check, unique và index (01 §7).
 - **Nghiệm thu:** `supabase db reset` chạy sạch; mọi bảng có `tournament_id` (trừ `tournaments`, `referee_tokens`); đúng tên cột theo tài liệu.
 
-### M1-3 Trigger (M)
+### M1-3 Trigger (M) — ✅ Test tạo 5 rubber, đội hình sai đội và organizer cuối; cascade xóa giải cũng qua
 - **Phụ thuộc:** M1-2.
 - **Việc:** (a) thêm `created_by` vào `tournament_organizers` sau khi tạo giải; (b) chặn xóa organizer cuối cùng; (c) sinh rubber theo `rubber_template` sau khi tạo tie; (d) sinh token sau khi tạo referee; (e) kiểm tra đội hình `rubber_players` (đúng đội, đúng phía, đúng số người).
 - **Nghiệm thu:** test SQL cho từng trigger; tạo tie 5 rubber đúng thứ tự đơn–đôi–đơn–đôi–đơn.
 - **Tham chiếu:** 01 §3.2, 3.6, 3.8, 3.11.
 
-### M1-4 Hàm trợ giúp, RLS và quyền cột (L)
+### M1-4 Hàm trợ giúp, RLS và quyền cột (L) — ✅ Test anon/public/draft, quyền ghi, cột hệ thống và cô lập organizer qua
 - **Phụ thuộc:** M1-3.
 - **Việc:** `is_organizer`, `is_tournament_visible`; bật RLS mọi bảng và viết policy theo ma trận 01 §4; `REVOKE UPDATE` rồi `GRANT UPDATE (cột)` cho `ties` và `rubbers`; chỉ cấp cho `anon` quyền `SELECT` bảng công khai.
 - **Nghiệm thu:** test 1–3 của 01 §9 qua; `anon` không đọc được `referee_tokens`, không ghi được bảng nào.
 - **Tham chiếu:** 01 §4.
 
-### M1-5 RPC chấm điểm (L)
+### M1-5 RPC chấm điểm (L) — ✅ Workflow xác nhận assigned/unassigned token, start, undo, luật game, retired/walkover/tie; 12 score đồng thời không mất điểm
 - **Phụ thuộc:** M1-4.
 - **Việc:** `assert_can_score`, `start_rubber`, `score_point`, `undo_point`, `end_rubber_early`, `end_rubber_walkover`, `recompute_tie`; công thức kết thúc game; khóa dòng `FOR UPDATE`; `recompute_tie` không cấp EXECUTE cho client.
 - **Nghiệm thu:** test 4, 6, 7, 8 của 01 §9 qua; 29–29 rồi 30–29 xong game; tie kết thúc khi 3 rubber, rubber còn lại `skipped`.
 - **Tham chiếu:** 01 §5.1.
 
-### M1-6 RPC ban tổ chức và trọng tài (S)
+### M1-6 RPC ban tổ chức và trọng tài (S) — ✅ Add organizer, finish tournament, walkover và token invalidation qua
 - **Phụ thuộc:** M1-4.
 - **Việc:** `add_organizer_by_email`, `finish_tournament` (xóa referees), `referee_whoami`; cấp EXECUTE đúng role.
 - **Nghiệm thu:** test 5 của 01 §9 qua; email không tồn tại trả `user_not_found`.
 - **Tham chiếu:** 01 §5.2, 5.3.
 
-### M1-7 View xếp hạng và Realtime publication (S)
+### M1-7 View xếp hạng và Realtime publication (S) — ✅ Standings tính điểm/rubber đúng; publication đã xác minh
 - **Phụ thuộc:** M1-5.
 - **Việc:** view `group_standings` (`security_invoker`); thêm `ties, rubbers, games` vào publication `supabase_realtime`.
 - **Nghiệm thu:** dữ liệu mẫu hai bảng cho thứ hạng đúng thứ tự tiêu chí; thay đổi `rubbers` phát sự kiện.
 - **Tham chiếu:** 01 §3.12, §6.
 
-### M1-8 Bộ test SQL và sinh type TypeScript (M)
+### M1-8 Bộ test SQL và sinh type TypeScript (M) — ✅ `bun run test:db` (15 pgTAP tests + concurrent score check) qua; generated types committed-source-ready
 - **Phụ thuộc:** M1-5, M1-6, M1-7.
 - **Việc:** gom 8 test của 01 §9 vào `supabase/tests/` (pgTAP hoặc script SQL) kèm lệnh chạy ghi trong README; tạo `src/lib/database.types.ts` bằng `supabase gen types typescript`.
 - **Nghiệm thu:** một lệnh chạy hết test và xanh; file type được commit.

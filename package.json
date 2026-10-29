@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "generate-routes": "tsr generate",
+    "test:db": "bunx supabase test db && bun scripts/test-db-concurrency.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "format": "biome format",
