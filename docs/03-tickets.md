@@ -185,22 +185,22 @@ M0 và M1 làm song song được (UI và database độc lập).
 
 > Phụ thuộc chung: M2-6 (cần có dữ liệu giải). Có thể bắt đầu với dữ liệu mẫu seed.
 
-### M3-1 Truy vấn dữ liệu công khai và component nền (M)
+### M3-1 Truy vấn dữ liệu công khai và component nền (M) — ✅ Hoàn thành
 - **Việc:** hook TanStack Query cho giải, tie, rubber, game, đội, xếp hạng; `TeamName`, `LiveBadge`, `ScoreBoard`, `RubberCard`, `TieCard`, `StandingsTable` (chưa realtime); trạng thái tải bằng `Skeleton`. `RubberCard` hỗ trợ hiển thị loại trận Đơn, Đôi và Đôi nam nữ (`mixed_doubles` viền và chữ màu xanh ngọc lục bảo `emerald` theo thiết kế "dòng xanh là đôi nam nữ"); hiển thị thông tin sân (`court`: Sân 1, Sân 2, Sân 3). `StandingsTable` thích ứng theo `standings_points_mode` (`rubbers_won` thì hiển thị điểm theo tổng trận đôi thắng, `tie_wins` thì tính theo trận tie thắng) kèm chú thích rõ ràng.
 - **Nghiệm thu:** các component hiển thị đúng với dữ liệu mẫu ở mọi trạng thái (`scheduled`, `live`, `finished`, `skipped`, tie chưa đủ đội); trận đôi nam nữ có huy hiệu xanh ngọc nổi bật; BXH hiển thị đúng cột điểm và chú thích cách tính điểm; đội A xanh dương, đội B cam; không chỉ dùng màu để phân biệt.
 - **Tham chiếu:** 02 §3.2, §6.
 
-### M3-2 Trang chủ danh sách giải (S)
+### M3-2 Trang chủ danh sách giải (S) — ✅ Hoàn thành
 - **Phụ thuộc:** M3-1.
 - **Việc:** route `/`; sắp xếp đang diễn ra → sắp tới → đã kết thúc; `LiveBadge` nếu có tie live; `Empty` khi chưa có giải.
 - **Nghiệm thu:** giải `draft` không xuất hiện với khán giả.
 
-### M3-3 Trang giải với các tab (L)
+### M3-3 Trang giải với các tab (L) — ✅ Hoàn thành
 - **Phụ thuộc:** M3-1.
 - **Việc:** `/t/$slug` với 5 tab (Trực tiếp, Lịch đấu, Bảng xếp hạng, Phân hạng & Chung kết / Vòng loại trực tiếp, Đội); tab mặc định theo có tie live hay không; `StandingsTable` thu gọn cột trên mobile. Tab thứ 4 hiển thị linh hoạt: nếu giải có các trận phân hạng thứ bậc (1-2, 3-4, 5-6) thì hiển thị 3 khối phân hạng rõ ràng (Chung kết Tranh 1–2, Tranh 3–4, Tranh 5–6) với các đội tự động lấy từ BXH vòng bảng; nếu là giải knockout truyền thống thì hiển thị nhánh đấu.
 - **Nghiệm thu:** hiển thị tốt ở 360px; các trận phân hạng hiển thị đúng cặp đấu sinh ra từ BXH; giải `draft` hoặc không tồn tại trả 404 giống nhau (không lộ sự tồn tại).
 
-### M3-4 Trang chi tiết tie (M)
+### M3-4 Trang chi tiết tie (M) — ✅ Hoàn thành
 - **Phụ thuộc:** M3-1.
 - **Việc:** `/t/$slug/ties/$tieId`; tỉ số tie cỡ lớn, `RubberCard` theo `position` hiển thị sân và giờ thi đấu (hỗ trợ hiển thị 3 sân Sân 1, Sân 2, Sân 3 đồng thời); tự cuộn tới rubber đang live (một lần); "Chờ xác định đội" khi chưa đủ đội.
 - **Nghiệm thu:** nếu giải có `play_all_rubbers = true`, không có rubber nào bị `skipped`, tất cả các rubber đều được đấu trọn vẹn và cập nhật điểm; với giải Thomas Cup, rubber `skipped` hiển thị mờ, gạch ngang, ghi "Không thi đấu".
