@@ -10,10 +10,11 @@
 		"includes": [
 			"**/src/**/*",
 			"**/.vscode/**/*",
-			"**/index.html",
+			"index.html",
 			"**/vite.config.ts",
 			"!**/src/routeTree.gen.ts",
-			"!**/src/styles.css"
+			"!**/src/styles.css",
+			"!**/dist/**/*"
 		]
 	},
 	"formatter": {
@@ -33,4 +34,3 @@
 		}
 	}
 }
-

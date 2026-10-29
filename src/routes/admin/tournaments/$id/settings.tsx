@@ -28,6 +28,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { showRpcError, toastSuccess } from "@/lib/rpc-errors";
 import { supabase } from "@/lib/supabase";
@@ -65,6 +66,34 @@ function TournamentSettingsPage() {
 	const [tieWinPoints, setTieWinPoints] = React.useState(
 		tournament.rule_tie_win_points,
 	);
+	const [playAllRubbers, setPlayAllRubbers] = React.useState(
+		tournament.play_all_rubbers ?? false,
+	);
+	const [standingsPointsMode, setStandingsPointsMode] = React.useState<
+		"tie_wins" | "rubbers_won"
+	>(
+		(tournament.standings_points_mode as "tie_wins" | "rubbers_won") ||
+			"tie_wins",
+	);
+
+	React.useEffect(() => {
+		setName(tournament.name);
+		setSlug(tournament.slug);
+		setVenue(tournament.venue || "");
+		setDescription(tournament.description || "");
+		setStartDate(tournament.start_date || "");
+		setEndDate(tournament.end_date || "");
+		setPointsToWin(tournament.rule_points_to_win);
+		setPointsCap(tournament.rule_points_cap);
+		setGamesToWin(tournament.rule_games_to_win);
+		setRubbersToWinTie(tournament.rule_rubbers_to_win_tie);
+		setTieWinPoints(tournament.rule_tie_win_points);
+		setPlayAllRubbers(tournament.play_all_rubbers ?? false);
+		setStandingsPointsMode(
+			(tournament.standings_points_mode as "tie_wins" | "rubbers_won") ||
+				"tie_wins",
+		);
+	}, [tournament]);
 
 	const [savingInfo, setSavingInfo] = React.useState(false);
 
@@ -139,6 +168,8 @@ function TournamentSettingsPage() {
 					rule_games_to_win: gamesToWin,
 					rule_rubbers_to_win_tie: rubbersToWinTie,
 					rule_tie_win_points: tieWinPoints,
+					play_all_rubbers: playAllRubbers,
+					standings_points_mode: standingsPointsMode,
 				})
 				.eq("id", tournament.id);
 
@@ -525,6 +556,57 @@ function TournamentSettingsPage() {
 									onChange={(e) => setTieWinPoints(Number(e.target.value))}
 									required
 								/>
+							</div>
+
+							<div className="space-y-1.5 sm:col-span-2 p-3 bg-muted/40 border border-border">
+								<div className="flex items-center justify-between gap-3">
+									<div>
+										<label
+											htmlFor="sPlayAllRubbers"
+											className="text-xs font-medium text-foreground block cursor-pointer"
+										>
+											Đánh đủ tất cả các trận trong tie (Play all rubbers)
+										</label>
+										<p className="text-[11px] text-muted-foreground mt-0.5">
+											Các trận trong tie vẫn tiếp tục diễn ra ngay cả khi một
+											đội đã đủ số trận thắng quy định (thích hợp cho giải Doanh
+											nghiệp hoặc tính điểm theo số trận thắng).
+										</p>
+									</div>
+									<Switch
+										id="sPlayAllRubbers"
+										checked={playAllRubbers}
+										onCheckedChange={setPlayAllRubbers}
+									/>
+								</div>
+							</div>
+
+							<div className="space-y-1.5 sm:col-span-2">
+								<label
+									htmlFor="sStandingsPointsMode"
+									className="text-xs font-medium text-foreground"
+								>
+									Chế độ tính điểm trên Bảng xếp hạng (Standings Points Mode)
+								</label>
+								<select
+									id="sStandingsPointsMode"
+									value={standingsPointsMode}
+									onChange={(e) =>
+										setStandingsPointsMode(
+											e.target.value as "tie_wins" | "rubbers_won",
+										)
+									}
+									className="w-full h-8 px-2.5 text-xs bg-background border border-input text-foreground outline-none focus:border-ring"
+								>
+									<option value="tie_wins">
+										Theo trận đồng đội thắng (tie_wins) — Mặc định BWF: Đội
+										thắng tie nhận điểm quy định
+									</option>
+									<option value="rubbers_won">
+										Theo tổng số trận con thắng (rubbers_won) — Giải Doanh
+										nghiệp: Mỗi rubber thắng tính 1 điểm trên BXH
+									</option>
+								</select>
 							</div>
 						</div>
 					</CardContent>

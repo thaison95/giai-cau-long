@@ -28,6 +28,14 @@ const ERROR_CODE_MAP: Record<string, string> = {
 	player_wrong_team: "Vận động viên được chọn không thuộc đội này.",
 	lineup_full: "Đã đủ số lượng vận động viên cho trận đấu này.",
 	lineup_incomplete: "Đội hình chưa đủ vận động viên ở cả hai phía.",
+	mixed_doubles_gender_invalid:
+		"Trận đôi nam nữ yêu cầu 1 vận động viên nam và 1 vận động viên nữ.",
+
+	// Phân hạng & Bảng đấu
+	group_not_finished:
+		"Vòng bảng chưa kết thúc. Vui lòng hoàn thành tất cả các trận đấu vòng bảng trước khi sinh lịch phân hạng.",
+	insufficient_teams_for_placement:
+		"Bảng đấu cần tối thiểu 6 đội để sinh 3 trận phân hạng.",
 
 	// Chấm điểm
 	no_point_to_undo: "Không có điểm nào để hoàn tác trong ván đấu hiện tại.",

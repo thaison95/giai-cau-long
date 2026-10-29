@@ -10,6 +10,7 @@ import {
 	PlusIcon,
 	RefreshCwIcon,
 	Trash2Icon,
+	TrophyIcon,
 } from "lucide-react";
 import * as React from "react";
 import {
@@ -42,6 +43,7 @@ import {
 	EmptyTitle,
 } from "@/components/ui/empty";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import type { Database } from "@/lib/database.types";
 import { showRpcError, toastSuccess } from "@/lib/rpc-errors";
 import { supabase } from "@/lib/supabase";
@@ -140,12 +142,20 @@ function TiesManagementPage() {
 	const [teamBId, setTeamBId] = React.useState<string>("");
 	const [scheduledAt, setScheduledAt] = React.useState("");
 	const [court, setCourt] = React.useState("");
+	const [assignSimultaneousCourts, setAssignSimultaneousCourts] =
+		React.useState(false);
 	const [submittingTie, setSubmittingTie] = React.useState(false);
 
 	// Dialog State: Tự động sinh vòng tròn (Round Robin)
 	const [roundRobinDialogOpen, setRoundRobinDialogOpen] = React.useState(false);
 	const [rrGroupId, setRrGroupId] = React.useState<string>("");
+	const [rrAssignCourts, setRrAssignCourts] = React.useState(true);
 	const [generatingRR, setGeneratingRR] = React.useState(false);
+
+	// Dialog State: Tự động sinh 3 trận phân hạng (1-2, 3-4, 5-6)
+	const [placementDialogOpen, setPlacementDialogOpen] = React.useState(false);
+	const [placementGroupId, setPlacementGroupId] = React.useState<string>("");
+	const [generatingPlacement, setGeneratingPlacement] = React.useState(false);
 
 	// Dialog Xóa Tie
 	const [deleteTieDialogOpen, setDeleteTieDialogOpen] = React.useState(false);
@@ -162,6 +172,7 @@ function TiesManagementPage() {
 		setTeamBId("");
 		setScheduledAt("");
 		setCourt("");
+		setAssignSimultaneousCourts(false);
 		setTieDialogOpen(true);
 	};
 
@@ -227,22 +238,38 @@ function TiesManagementPage() {
 				if (error) throw error;
 				toastSuccess("Cập nhật trận đấu thành công!");
 			} else {
-				// Tạo tie mới (Trigger trg_ties_create_rubbers sẽ tự sinh 5 rubber)
-				const { error } = await supabase.from("ties").insert({
-					tournament_id: tournament.id,
-					stage,
-					group_id: stage === "group" ? groupId : null,
-					round_label: label,
-					round_order: roundOrder,
-					team_a_id: teamAId || null,
-					team_b_id: teamBId || null,
-					scheduled_at: scheduledIso,
-					court: court.trim() || null,
-				});
+				// Tạo tie mới (Trigger database sẽ tự sinh các rubber theo mẫu giải)
+				const { data: createdTie, error } = await supabase
+					.from("ties")
+					.insert({
+						tournament_id: tournament.id,
+						stage,
+						group_id: stage === "group" ? groupId : null,
+						round_label: label,
+						round_order: roundOrder,
+						team_a_id: teamAId || null,
+						team_b_id: teamBId || null,
+						scheduled_at: scheduledIso,
+						court:
+							court.trim() || (assignSimultaneousCourts ? "Sân 1, 2, 3" : null),
+					})
+					.select("id")
+					.single();
 
 				if (error) throw error;
+
+				if (assignSimultaneousCourts && createdTie) {
+					for (let pos = 1; pos <= 3; pos++) {
+						await supabase
+							.from("rubbers")
+							.update({ court: `Sân ${pos}` })
+							.eq("tie_id", createdTie.id)
+							.eq("position", pos);
+					}
+				}
+
 				toastSuccess(
-					"Tạo trận đấu thành công! Hệ thống đã tự sinh 5 trận theo mẫu giải.",
+					"Tạo trận đấu thành công! Hệ thống đã tự sinh các trận theo mẫu giải.",
 				);
 			}
 
@@ -317,10 +344,25 @@ function TiesManagementPage() {
 				round_order: baseOrder + idx + 1,
 				team_a_id: pair.teamA.id,
 				team_b_id: pair.teamB.id,
+				court: rrAssignCourts ? "Sân 1, 2, 3" : null,
 			}));
 
-			const { error } = await supabase.from("ties").insert(payload);
+			const { data: insertedTies, error } = await supabase
+				.from("ties")
+				.insert(payload)
+				.select("id");
 			if (error) throw error;
+
+			if (rrAssignCourts && insertedTies && insertedTies.length > 0) {
+				const tieIds = insertedTies.map((t) => t.id);
+				for (let pos = 1; pos <= 3; pos++) {
+					await supabase
+						.from("rubbers")
+						.update({ court: `Sân ${pos}` })
+						.in("tie_id", tieIds)
+						.eq("position", pos);
+				}
+			}
 
 			toastSuccess(
 				`Đã tạo tự động thành công ${pairsToCreate.length} trận đấu vòng tròn cho ${selectedGroup.name}!`,
@@ -331,6 +373,35 @@ function TiesManagementPage() {
 			showRpcError(err);
 		} finally {
 			setGeneratingRR(false);
+		}
+	};
+
+	// Tự động sinh 3 trận phân hạng (1-2, 3-4, 5-6) từ BXH
+	const handleGeneratePlacement = async (e: React.FormEvent) => {
+		e.preventDefault();
+		if (!placementGroupId) {
+			showRpcError("Vui lòng chọn bảng đấu để sinh 3 trận phân hạng.");
+			return;
+		}
+
+		setGeneratingPlacement(true);
+		try {
+			const { error } = await supabase.rpc("generate_placement_ties", {
+				p_tournament_id: tournament.id,
+				p_group_id: placementGroupId,
+			});
+
+			if (error) throw error;
+
+			toastSuccess(
+				"Đã tự động sinh thành công 3 trận phân hạng (1–2, 3–4, 5–6)!",
+			);
+			setPlacementDialogOpen(false);
+			refetch();
+		} catch (err) {
+			showRpcError(err);
+		} finally {
+			setGeneratingPlacement(false);
 		}
 	};
 
@@ -368,17 +439,30 @@ function TiesManagementPage() {
 				</div>
 				<div className="flex items-center gap-2 flex-wrap">
 					{groups.length > 0 && (
-						<Button
-							variant="outline"
-							onClick={() => {
-								setRrGroupId(groups[0]?.id || "");
-								setRoundRobinDialogOpen(true);
-							}}
-							className="gap-1.5 text-xs"
-						>
-							<RefreshCwIcon className="size-3.5" />
-							<span>Tạo vòng tròn cho bảng</span>
-						</Button>
+						<>
+							<Button
+								variant="outline"
+								onClick={() => {
+									setRrGroupId(groups[0]?.id || "");
+									setRoundRobinDialogOpen(true);
+								}}
+								className="gap-1.5 text-xs"
+							>
+								<RefreshCwIcon className="size-3.5" />
+								<span>Tạo vòng tròn cho bảng</span>
+							</Button>
+							<Button
+								variant="outline"
+								onClick={() => {
+									setPlacementGroupId(groups[0]?.id || "");
+									setPlacementDialogOpen(true);
+								}}
+								className="gap-1.5 text-xs text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/10"
+							>
+								<TrophyIcon className="size-3.5" />
+								<span>Sinh 3 trận phân hạng (1-2, 3-4, 5-6)</span>
+							</Button>
+						</>
 					)}
 					<Button onClick={handleOpenCreateTie} className="gap-1.5 text-xs">
 						<PlusIcon className="size-4" />
@@ -802,6 +886,28 @@ function TiesManagementPage() {
 							</div>
 						</div>
 
+						{!editingTie && (
+							<div className="flex items-center justify-between p-2.5 bg-muted/30 border border-border">
+								<div>
+									<label
+										htmlFor="assignSimultaneousCourts"
+										className="text-xs font-medium text-foreground block cursor-pointer"
+									>
+										Gán 3 sân đồng thời cho 3 rubber
+									</label>
+									<p className="text-[11px] text-muted-foreground">
+										Tự động gán Rubber 1 → Sân 1, Rubber 2 → Sân 2, Rubber 3 →
+										Sân 3.
+									</p>
+								</div>
+								<Switch
+									id="assignSimultaneousCourts"
+									checked={assignSimultaneousCourts}
+									onCheckedChange={setAssignSimultaneousCourts}
+								/>
+							</div>
+						)}
+
 						<DialogFooter className="pt-2">
 							<Button
 								type="button"
@@ -865,6 +971,26 @@ function TiesManagementPage() {
 							</select>
 						</div>
 
+						<div className="flex items-center justify-between p-2.5 bg-muted/30 border border-border">
+							<div>
+								<label
+									htmlFor="rrAssignCourts"
+									className="text-xs font-medium text-foreground block cursor-pointer"
+								>
+									Gán 3 sân đồng thời cho từng trận
+								</label>
+								<p className="text-[11px] text-muted-foreground">
+									Gán sân chung 'Sân 1, 2, 3' cho tie và Rubber 1 → Sân 1,
+									Rubber 2 → Sân 2, Rubber 3 → Sân 3.
+								</p>
+							</div>
+							<Switch
+								id="rrAssignCourts"
+								checked={rrAssignCourts}
+								onCheckedChange={setRrAssignCourts}
+							/>
+						</div>
+
 						<DialogFooter className="pt-2">
 							<Button
 								type="button"
@@ -879,6 +1005,82 @@ function TiesManagementPage() {
 								{generatingRR
 									? "Đang sinh lịch thi đấu..."
 									: "Bắt đầu sinh vòng tròn"}
+							</Button>
+						</DialogFooter>
+					</form>
+				</DialogContent>
+			</Dialog>
+
+			{/* Dialog Tự Động Sinh 3 Trận Phân Hạng (1-2, 3-4, 5-6) */}
+			<Dialog open={placementDialogOpen} onOpenChange={setPlacementDialogOpen}>
+				<DialogContent className="sm:max-w-md">
+					<DialogHeader>
+						<DialogTitle className="flex items-center gap-2">
+							<TrophyIcon className="size-4 text-emerald-600 dark:text-emerald-400" />
+							<span>Sinh 3 trận phân hạng (1–2, 3–4, 5–6)</span>
+						</DialogTitle>
+						<DialogDescription className="space-y-1.5 text-xs">
+							<span>
+								Hệ thống sẽ lấy kết quả từ Bảng xếp hạng vòng bảng và tạo 3 trận
+								knockout phân hạng đồng loạt trên 3 sân:
+							</span>
+							<span className="block font-medium text-foreground">
+								• Trận 1: Hạng 1 vs Hạng 2 (Chung kết)
+								<br />• Trận 2: Hạng 3 vs Hạng 4
+								<br />• Trận 3: Hạng 5 vs Hạng 6
+							</span>
+							<span className="block text-[11px] text-destructive">
+								Yêu cầu: Toàn bộ trận đấu vòng bảng phải hoàn thành và bảng cần
+								tối thiểu 6 đội.
+							</span>
+						</DialogDescription>
+					</DialogHeader>
+
+					<form onSubmit={handleGeneratePlacement} className="space-y-4 pt-2">
+						<div className="space-y-1.5">
+							<label
+								htmlFor="placementGroupSelect"
+								className="text-xs font-medium text-foreground"
+							>
+								Chọn bảng đấu <span className="text-destructive">*</span>
+							</label>
+							<select
+								id="placementGroupSelect"
+								value={placementGroupId}
+								onChange={(e) => setPlacementGroupId(e.target.value)}
+								required
+								className="h-9 w-full border border-input bg-background px-2 text-xs"
+							>
+								{groups.map((g) => {
+									const count = teams.filter((t) => t.group_id === g.id).length;
+									return (
+										<option key={g.id} value={g.id}>
+											{g.name} ({count} đội)
+										</option>
+									);
+								})}
+							</select>
+						</div>
+
+						<DialogFooter className="pt-2">
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => setPlacementDialogOpen(false)}
+								disabled={generatingPlacement}
+							>
+								Hủy
+							</Button>
+							<Button
+								type="submit"
+								size="sm"
+								disabled={generatingPlacement}
+								className="bg-emerald-600 hover:bg-emerald-700 text-white"
+							>
+								{generatingPlacement
+									? "Đang sinh trận phân hạng..."
+									: "Xác nhận sinh 3 trận phân hạng"}
 							</Button>
 						</DialogFooter>
 					</form>

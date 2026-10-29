@@ -7,6 +7,7 @@ import {
 	ClockIcon,
 	FlagIcon,
 	MapPinIcon,
+	RotateCcwIcon,
 	ShieldCheckIcon,
 	UserCheckIcon,
 } from "lucide-react";
@@ -240,6 +241,30 @@ function AdminTieDetailPage() {
 		}
 	};
 
+	// Mở lại rubber đã kết thúc (nếu bấm nhầm điểm ở thể thức 1 set 21đ)
+	const [reopeningRubberId, setReopeningRubberId] = React.useState<
+		string | null
+	>(null);
+
+	const handleReopenRubber = async (rubberId: string) => {
+		setReopeningRubberId(rubberId);
+		try {
+			const { error } = await supabase.rpc("reopen_finished_rubber", {
+				p_rubber_id: rubberId,
+			});
+
+			if (error) throw error;
+			toastSuccess(
+				"Đã mở lại trận đấu thành công. Điểm số đã lùi 1 điểm để tiếp tục thi đấu.",
+			);
+			refetch();
+		} catch (err) {
+			showRpcError(err);
+		} finally {
+			setReopeningRubberId(null);
+		}
+	};
+
 	if (isLoading || !tie) {
 		return (
 			<div className="space-y-4">
@@ -389,16 +414,22 @@ function AdminTieDetailPage() {
 				</div>
 			)}
 
-			{/* Danh sách 5 Rubbers */}
+			{/* Danh sách Rubbers */}
 			<div className="space-y-4">
 				<div className="flex items-center justify-between">
 					<h3 className="font-heading text-sm font-semibold text-foreground">
-						Danh sách 5 trận (Rubbers)
+						Danh sách các trận (Rubbers)
 					</h3>
 					<span className="text-xs text-muted-foreground">
 						Mẫu giải:{" "}
 						{tournament.rubber_template
-							.map((r) => (r === "singles" ? "Đơn" : "Đôi"))
+							.map((r) =>
+								r === "singles"
+									? "Đơn"
+									: r === "mixed_doubles"
+										? "Đôi nam nữ"
+										: "Đôi",
+							)
 							.join(" – ")}
 					</span>
 				</div>
@@ -430,6 +461,8 @@ function AdminTieDetailPage() {
 								setWalkoverSide("a");
 								setWalkoverDialogOpen(true);
 							}}
+							onReopen={() => handleReopenRubber(rubber.id)}
+							isReopening={reopeningRubberId === rubber.id}
 							onRefetch={refetch}
 						/>
 					);
@@ -552,6 +585,37 @@ function AdminTieDetailPage() {
 	);
 }
 
+function RubberKindBadge({ kind }: { kind: Rubber["kind"] }) {
+	if (kind === "mixed_doubles") {
+		return (
+			<Badge
+				variant="outline"
+				className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-[10px] font-semibold"
+			>
+				Đôi nam nữ (Mixed)
+			</Badge>
+		);
+	}
+	if (kind === "doubles") {
+		return (
+			<Badge
+				variant="outline"
+				className="bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/30 text-[10px] font-semibold"
+			>
+				Đôi (Doubles)
+			</Badge>
+		);
+	}
+	return (
+		<Badge
+			variant="outline"
+			className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 text-[10px] font-semibold"
+		>
+			Đơn (Singles)
+		</Badge>
+	);
+}
+
 /**
  * Thẻ hiển thị và chỉnh sửa 1 Rubber (Trận đơn/đôi)
  */
@@ -568,6 +632,8 @@ function RubberAdminCard({
 	onUpdateReferee,
 	onUpdateScheduleCourt,
 	onWalkover,
+	onReopen,
+	isReopening,
 	onRefetch,
 }: {
 	rubber: Rubber;
@@ -585,6 +651,8 @@ function RubberAdminCard({
 		court: string | null,
 	) => void;
 	onWalkover: () => void;
+	onReopen: () => void;
+	isReopening?: boolean;
 	onRefetch: () => void;
 }) {
 	const [scheduledAt, setScheduledAt] = React.useState(
@@ -693,9 +761,9 @@ function RubberAdminCard({
 			<CardHeader className="bg-muted/40 border-b border-border py-2.5 px-4 flex flex-row items-center justify-between gap-2">
 				<div className="flex items-center gap-2 flex-wrap">
 					<span className="font-heading text-xs font-bold text-foreground">
-						Trận {rubber.position}:{" "}
-						{rubber.kind === "singles" ? "Đơn (Singles)" : "Đôi (Doubles)"}
+						Trận {rubber.position}:
 					</span>
+					<RubberKindBadge kind={rubber.kind} />
 					<RubberStatusBadge status={rubber.status} />
 					{rubber.end_reason && rubber.end_reason !== "normal" && (
 						<Badge variant="warning" className="text-[10px] h-4">
@@ -706,7 +774,7 @@ function RubberAdminCard({
 					)}
 				</div>
 
-				{/* Điểm ván */}
+				{/* Điểm ván & Hành động */}
 				<div className="flex items-center gap-2">
 					{rubber.status !== "scheduled" && (
 						<span className="font-mono text-xs font-bold text-foreground bg-background px-2 py-0.5 border border-border">
@@ -724,6 +792,20 @@ function RubberAdminCard({
 						>
 							<FlagIcon className="size-3 mr-1" />
 							Xử thua
+						</Button>
+					)}
+
+					{rubber.status === "finished" && (
+						<Button
+							variant="outline"
+							size="xs"
+							onClick={onReopen}
+							disabled={isReopening}
+							className="text-[11px] h-6 text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
+							title="Mở lại trận đấu để chỉnh sửa điểm khi bấm nhầm điểm kết thúc (lùi 1 điểm để tiếp tục thi đấu)"
+						>
+							<RotateCcwIcon className="size-3 mr-1" />
+							{isReopening ? "Đang mở lại..." : "Mở lại trận"}
 						</Button>
 					)}
 				</div>
