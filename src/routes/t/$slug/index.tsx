@@ -184,7 +184,7 @@ function TournamentPublicPage() {
 			<div className="mb-8 border-b border-border/80 pb-6">
 				<div className="flex flex-wrap items-center gap-2 mb-2">
 					{hasLiveTies && <LiveBadge />}
-					{isFinished ? (
+					{/*{isFinished ? (
 						<Badge
 							variant="outline"
 							className="text-muted-foreground text-[11px]"
@@ -211,7 +211,7 @@ function TournamentPublicPage() {
 						>
 							Tính điểm theo trận nhỏ
 						</Badge>
-					)}
+					)}*/}
 				</div>
 
 				<h1 className="font-heading text-2xl md:text-3xl font-extrabold text-foreground tracking-tight leading-snug">
