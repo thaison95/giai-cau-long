@@ -186,8 +186,8 @@ M0 và M1 làm song song được (UI và database độc lập).
 > Phụ thuộc chung: M2-6 (cần có dữ liệu giải). Có thể bắt đầu với dữ liệu mẫu seed.
 
 ### M3-1 Truy vấn dữ liệu công khai và component nền (M)
-- **Việc:** hook TanStack Query cho giải, tie, rubber, game, đội, xếp hạng; `TeamName`, `LiveBadge`, `ScoreBoard`, `RubberCard`, `TieCard`, `StandingsTable` (chưa realtime); trạng thái tải bằng `Skeleton`.
-- **Nghiệm thu:** các component hiển thị đúng với dữ liệu mẫu ở mọi trạng thái (`scheduled`, `live`, `finished`, `skipped`, tie chưa đủ đội); đội A xanh dương, đội B cam; không chỉ dùng màu để phân biệt.
+- **Việc:** hook TanStack Query cho giải, tie, rubber, game, đội, xếp hạng; `TeamName`, `LiveBadge`, `ScoreBoard`, `RubberCard`, `TieCard`, `StandingsTable` (chưa realtime); trạng thái tải bằng `Skeleton`. `RubberCard` hỗ trợ hiển thị loại trận Đơn, Đôi và Đôi nam nữ (`mixed_doubles` viền và chữ màu xanh ngọc lục bảo `emerald` theo thiết kế "dòng xanh là đôi nam nữ"); hiển thị thông tin sân (`court`: Sân 1, Sân 2, Sân 3). `StandingsTable` thích ứng theo `standings_points_mode` (`rubbers_won` thì hiển thị điểm theo tổng trận đôi thắng, `tie_wins` thì tính theo trận tie thắng) kèm chú thích rõ ràng.
+- **Nghiệm thu:** các component hiển thị đúng với dữ liệu mẫu ở mọi trạng thái (`scheduled`, `live`, `finished`, `skipped`, tie chưa đủ đội); trận đôi nam nữ có huy hiệu xanh ngọc nổi bật; BXH hiển thị đúng cột điểm và chú thích cách tính điểm; đội A xanh dương, đội B cam; không chỉ dùng màu để phân biệt.
 - **Tham chiếu:** 02 §3.2, §6.
 
 ### M3-2 Trang chủ danh sách giải (S)
@@ -197,13 +197,13 @@ M0 và M1 làm song song được (UI và database độc lập).
 
 ### M3-3 Trang giải với các tab (L)
 - **Phụ thuộc:** M3-1.
-- **Việc:** `/t/$slug` với 5 tab (Trực tiếp, Lịch đấu, Bảng xếp hạng, Vòng loại trực tiếp, Đội); tab mặc định theo có tie live hay không; `StandingsTable` thu gọn cột trên mobile.
-- **Nghiệm thu:** hiển thị tốt ở 360px; giải `draft` hoặc không tồn tại trả 404 giống nhau (không lộ sự tồn tại).
+- **Việc:** `/t/$slug` với 5 tab (Trực tiếp, Lịch đấu, Bảng xếp hạng, Phân hạng & Chung kết / Vòng loại trực tiếp, Đội); tab mặc định theo có tie live hay không; `StandingsTable` thu gọn cột trên mobile. Tab thứ 4 hiển thị linh hoạt: nếu giải có các trận phân hạng thứ bậc (1-2, 3-4, 5-6) thì hiển thị 3 khối phân hạng rõ ràng (Chung kết Tranh 1–2, Tranh 3–4, Tranh 5–6) với các đội tự động lấy từ BXH vòng bảng; nếu là giải knockout truyền thống thì hiển thị nhánh đấu.
+- **Nghiệm thu:** hiển thị tốt ở 360px; các trận phân hạng hiển thị đúng cặp đấu sinh ra từ BXH; giải `draft` hoặc không tồn tại trả 404 giống nhau (không lộ sự tồn tại).
 
 ### M3-4 Trang chi tiết tie (M)
 - **Phụ thuộc:** M3-1.
-- **Việc:** `/t/$slug/ties/$tieId`; tỉ số tie cỡ lớn, `RubberCard` theo `position`; tự cuộn tới rubber đang live (một lần); "Chờ xác định đội" khi chưa đủ đội.
-- **Nghiệm thu:** rubber `skipped` hiển thị mờ, gạch ngang, ghi "Không thi đấu".
+- **Việc:** `/t/$slug/ties/$tieId`; tỉ số tie cỡ lớn, `RubberCard` theo `position` hiển thị sân và giờ thi đấu (hỗ trợ hiển thị 3 sân Sân 1, Sân 2, Sân 3 đồng thời); tự cuộn tới rubber đang live (một lần); "Chờ xác định đội" khi chưa đủ đội.
+- **Nghiệm thu:** nếu giải có `play_all_rubbers = true`, không có rubber nào bị `skipped`, tất cả các rubber đều được đấu trọn vẹn và cập nhật điểm; với giải Thomas Cup, rubber `skipped` hiển thị mờ, gạch ngang, ghi "Không thi đấu".
 
 ---
 
@@ -217,8 +217,8 @@ M0 và M1 làm song song được (UI và database độc lập).
 
 ### M4-2 Màn chấm điểm (L)
 - **Phụ thuộc:** M4-1.
-- **Việc:** `/r/$token/rubbers/$rubberId` theo đặc tả 02 §5: hai vùng điểm lớn chạm được, chuỗi điểm game, 2 nút hoàn tác, trạng thái `scheduled`/`live`/`finished`, nút "Bắt đầu trận" bị khóa kèm lý do khi thiếu đội hình hoặc đội; gọi `start_rubber`, `score_point`, `undo_point`.
-- **Nghiệm thu:** chấm đủ một rubber 2–0 và một rubber 2–1; game kết thúc đúng công thức; rubber tự kết thúc.
+- **Việc:** `/r/$token/rubbers/$rubberId` theo đặc tả 02 §5: hai vùng điểm lớn chạm được, chuỗi điểm game, 2 nút hoàn tác, trạng thái `scheduled`/`live`/`finished`, nút "Bắt đầu trận" bị khóa kèm lý do khi thiếu đội hình hoặc đội; hiển thị rõ nhãn loại trận (Đơn, Đôi, Đôi nam nữ); hỗ trợ cả thể thức 1 set 21 điểm (`rule_games_to_win = 1`) và best-of-3 (`rule_games_to_win = 2`); gọi `start_rubber`, `score_point`, `undo_point`.
+- **Nghiệm thu:** ở thể thức 1 set 21 điểm, chạm điểm kết thúc (ví dụ 21–18 hoặc 30–29) thì rubber tự động chuyển thành `finished` ngay lập tức không có ván 2; ở thể thức best-of-3 chấm đủ 2–0 và 2–1; game kết thúc đúng công thức; rubber tự kết thúc.
 
 ### M4-3 Hành vi nâng cao của màn chấm điểm (M)
 - **Phụ thuộc:** M4-2.
@@ -230,10 +230,10 @@ M0 và M1 làm song song được (UI và database độc lập).
 - **Việc:** nút "Kết thúc sớm" mở `alert-dialog` chọn phía thắng, gọi `end_rubber_early`; trang quản trị có nút xử thua `end_rubber_walkover` cho rubber `scheduled`.
 - **Nghiệm thu:** tie vẫn kết thúc đúng khi có rubber kết thúc sớm hoặc xử thua.
 
-### M4-5 Ban tổ chức chấm thay (S)
+### M4-5 Ban tổ chức chấm thay và can thiệp (S)
 - **Phụ thuộc:** M4-2, M2-8.
-- **Việc:** từ trang tie ở khu quản trị mở màn chấm điểm dùng chung, không cần token; chấm được mọi rubber dù chưa gán trọng tài.
-- **Nghiệm thu:** organizer chấm được rubber chưa gán; người không phải organizer và không có token bị `forbidden`.
+- **Việc:** từ trang tie ở khu quản trị mở màn chấm điểm dùng chung, không cần token; chấm được mọi rubber dù chưa gán trọng tài; nút "Mở lại trận đấu" gọi `reopen_finished_rubber` để khôi phục rubber về `live` và lùi 1 điểm nếu trọng tài lỡ tay bấm nhầm điểm 21 ở thể thức 1 set.
+- **Nghiệm thu:** organizer chấm được rubber chưa gán; mở lại được rubber `finished` để sửa điểm; người không phải organizer và không có token bị `forbidden`.
 
 ---
 
@@ -254,7 +254,7 @@ M0 và M1 làm song song được (UI và database độc lập).
 
 ### M5-3 Realtime cho màn chấm điểm và trang giải (S)
 - **Phụ thuộc:** M5-1.
-- **Việc:** màn chấm điểm tự cập nhật khi người khác chấm thay; tab Trực tiếp và Lịch đấu, trang chủ cập nhật trạng thái live.
+- **Việc:** màn chấm điểm tự cập nhật khi người khác chấm thay; tab Trực tiếp và Lịch đấu, trang chủ cập nhật trạng thái live (cập nhật đồng thời 3 sân thi đấu song song mượt mà).
 - **Nghiệm thu:** rubber vừa bắt đầu xuất hiện ở tab Trực tiếp không cần tải lại trang.
 
 ---
@@ -277,8 +277,10 @@ M0 và M1 làm song song được (UI và database độc lập).
 
 ### M6-4 Kiểm thử đầu-cuối bằng thiết bị thật (M)
 - **Phụ thuộc:** M5, M6-1.
-- **Việc:** chạy kịch bản: tạo giải → thêm 4 đội → bảng → vòng tròn → đội hình → gán trọng tài → công khai → chấm trọn một tie bằng điện thoại → khán giả xem realtime → kết thúc giải; ghi lại lỗi và sửa.
-- **Nghiệm thu:** kịch bản chạy hết không lỗi; ghi kết quả vào `docs/` (checklist đã tick).
+- **Việc:** chạy 2 kịch bản:
+  1) **Kịch bản Giải Doanh nghiệp (Trusting Social):** tạo giải 3 đôi (có đôi nam nữ dòng xanh), 1 set 21đ, `play_all_rubbers=true`, `rubbers_won` → 6 đội → Bảng A → sinh 15 trận vòng tròn 3 sân song song → soạn đội hình → gán trọng tài → công khai → chấm điểm trên điện thoại → xem BXH theo tổng trận thắng → sinh 3 trận phân hạng (1-2, 3-4, 5-6) → chấm chung kết → kết thúc giải.
+  2) **Kịch bản Thomas Cup chuẩn:** 4 đội → 5 rubber đơn/đôi → best of 3 → chạm 3 dừng.
+- **Nghiệm thu:** cả hai kịch bản chạy hết không lỗi; ghi kết quả vào `docs/` (checklist đã tick).
 
 ### M6-5 Phát hành production và tài liệu vận hành (S)
 - **Phụ thuộc:** M6-4.
