@@ -9,6 +9,8 @@ import Footer from '../components/Footer'
 import Header from '../components/Header'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import { Toaster } from '@/components/ui/sonner'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 import appCss from '../styles.css?url'
 
@@ -31,7 +33,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'Giải cầu lông đồng đội',
       },
     ],
     links: [
@@ -42,19 +44,23 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
   shellComponent: RootDocument,
+  notFoundComponent: () => <main className="mx-auto grid min-h-[70vh] max-w-5xl place-content-center px-4 text-center"><h1 className="font-heading text-2xl font-bold">Không tìm thấy trang</h1><p className="mt-3 text-sm text-muted-foreground">Đường dẫn này không tồn tại hoặc đã được thay đổi.</p><a className="mt-5 text-sm text-primary" href="/">Về trang chủ</a></main>,
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="vi" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
-        <Header />
-        {children}
-        <Footer />
+      <body className="font-sans antialiased [overflow-wrap:anywhere]">
+        <TooltipProvider>
+          <Header />
+          {children}
+          <Footer />
+          <Toaster />
+        </TooltipProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',
