@@ -187,10 +187,8 @@ function TeamsManagementPage() {
 			return;
 		}
 
-		if (!shortName || !/^[A-Z0-9]{1,4}$/.test(shortName)) {
-			showRpcError(
-				"Tên viết tắt phải từ 1 đến 4 ký tự in hoa hoặc chữ số (ví dụ: VIE, HN, TQ).",
-			);
+		if (!shortName || Array.from(shortName).length > 4) {
+			showRpcError("Tên viết tắt phải từ 1 đến 4 ký tự (ví dụ: Đ1, HN, VIE).");
 			return;
 		}
 
@@ -598,7 +596,7 @@ function TeamsManagementPage() {
 									onChange={(e) =>
 										setTeamShortName(e.target.value.toUpperCase())
 									}
-									placeholder="HAN, BG"
+									placeholder="Đ1, HN, VIE"
 									maxLength={4}
 									required
 									className="font-mono uppercase"

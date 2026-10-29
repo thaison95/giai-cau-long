@@ -121,7 +121,7 @@ export function getRpcErrorMessage(
 			return "Đường dẫn (slug) chỉ được chứa chữ thường không dấu (a-z), chữ số (0-9) và dấu gạch ngang (-).";
 		}
 		if (lower.includes("short_name")) {
-			return "Tên viết tắt của đội phải từ 1 đến 4 ký tự in hoa hoặc chữ số (ví dụ: VIE, HN).";
+			return "Tên viết tắt của đội phải từ 1 đến 4 ký tự (ví dụ: Đ1, HN, VIE).";
 		}
 		if (lower.includes("team_a_id <> team_b_id")) {
 			return "Hai đội thi đấu phải là hai đội khác nhau.";
@@ -143,6 +143,16 @@ export function getRpcErrorMessage(
 	// 4. Nếu là lỗi mạng chung
 	if (lower.includes("failed to fetch") || lower.includes("networkerror")) {
 		return "Không thể kết nối tới máy chủ. Vui lòng kiểm tra lại kết nối mạng.";
+	}
+
+	// 5. Nếu chuỗi lỗi đã là thông báo tiếng Việt có nghĩa (ví dụ form validation từ client)
+	if (
+		typeof error === "string" &&
+		/[à-ỹÀ-ỸđĐ]/.test(raw) &&
+		!raw.includes("violates") &&
+		!raw.includes("constraint")
+	) {
+		return raw;
 	}
 
 	return fallbackMessage;
