@@ -2,5 +2,9 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "giaicaulong",
   "compatibility_date": "2025-09-02",
-  "pages_build_output_dir": "./dist/client"
+  "pages_build_output_dir": "./dist/client",
+  "vars": {
+    "VITE_SUPABASE_URL": "https://acxzxfqdzkxtvmegkupp.supabase.co",
+    "VITE_SUPABASE_ANON_KEY": "sb_publishable_CL2RAB7NT5qUJ5q65yJw7A_rGamZXX1"
+  }
 }
