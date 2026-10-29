@@ -9,12 +9,12 @@ teams_data = [
         "short_name": "Đ1",
         "emoji": "1️⃣",
         "players": [
-            ("Q.Long", "m"),
-            ("Sang", "m"),
-            ("Nhân", "m"),
-            ("P.Long", "m"),
-            ("Bảo", "m"),
-            ("Thảo", "f"),
+            ("Bảo Thái", "m", "Bảo"),
+            ("Lê Thanh Nhân", "m", "Nhân"),
+            ("Nguyễn Lê Phi Long", "m", "P.Long"),
+            ("Phạm Quốc Long", "m", "Q.Long"),
+            ("Sang", "m", "Sang"),
+            ("Thảo Đặng", "f", "Thảo"),
         ]
     },
     {
@@ -23,12 +23,12 @@ teams_data = [
         "short_name": "Đ2",
         "emoji": "2️⃣",
         "players": [
-            ("Giang", "m"),
-            ("Tú", "m"),
-            ("Luân", "m"),
-            ("Thiên", "m"),
-            ("Gương", "f"),
-            ("Phúc", "f"),
+            ("Giang", "m", "Giang"),
+            ("Guong Pham", "f", "Gương"),
+            ("Luân pickleball", "m", "Luân"),
+            ("Nguyễn Minh Thiên", "m", "Thiên"),
+            ("Phuc Cao", "f", "Phúc"),
+            ("Trần Văn Tú", "m", "Tú"),
         ]
     },
     {
@@ -37,12 +37,12 @@ teams_data = [
         "short_name": "Đ3",
         "emoji": "3️⃣",
         "players": [
-            ("Dũng", "m"),
-            ("Minh", "m"),
-            ("Huy", "m"),
-            ("Khánh", "m"),
-            ("Đức", "m"),
-            ("Oanh", "f"),
+            ("Dũng thứ 2", "m", "Dũng"),
+            ("Huy Vũ", "m", "Huy"),
+            ("Minh - RiskVN", "m", "Minh"),
+            ("Nguyễn Ngô Minh Đức", "m", "Đức"),
+            ("Oanh", "f", "Oanh"),
+            ("Trần Minh Khánh", "m", "Khánh"),
         ]
     },
     {
@@ -51,12 +51,12 @@ teams_data = [
         "short_name": "Đ4",
         "emoji": "4️⃣",
         "players": [
-            ("Xuân", "m"),
-            ("An", "m"),
-            ("Sơn", "m"),
-            ("Nhực", "m"),
-            ("Tuấn", "m"),
-            ("Nhi", "f"),
+            ("An Nguyễn", "m", "An"),
+            ("Nguyễn Viết Xuân", "m", "Xuân"),
+            ("Nhi Doan", "f", "Nhi"),
+            ("Nhực Corn", "m", "Nhực"),
+            ("Thái Sơn", "m", "Sơn"),
+            ("Tuấn Bùi", "m", "Tuấn"),
         ]
     },
     {
@@ -65,12 +65,12 @@ teams_data = [
         "short_name": "Đ5",
         "emoji": "5️⃣",
         "players": [
-            ("Quân", "m"),
-            ("Hào", "m"),
-            ("Tâm", "m"),
-            ("Nhu Em", "m"),
-            ("Hồng", "f"),
-            ("Hạnh", "f"),
+            ("Đồng Minh Quân", "m", "Quân"),
+            ("Hạnh Phạm", "f", "Hạnh"),
+            ("Lê Hồng Nhu Em", "m", "Nhu Em"),
+            ("Nguyễn Ngọc Ánh Hồng", "f", "Hồng"),
+            ("Phạm Ngọc Tâm", "m", "Tâm"),
+            ("Tăng Anh Hào", "m", "Hào"),
         ]
     },
     {
@@ -79,17 +79,18 @@ teams_data = [
         "short_name": "Đ6",
         "emoji": "6️⃣",
         "players": [
-            ("Cường", "m"),
-            ("K.Đào", "m"),
-            ("Triết", "m"),
-            ("Bình", "m"),
-            ("T.Huy", "m"),
-            ("Mindy", "f"),
+            ("Cường Châu", "m", "Cường"),
+            ("Khánh Đào", "m", "K.Đào"),
+            ("Mindy", "f", "Mindy"),
+            ("Nguyễn Thanh Bình", "m", "Bình"),
+            ("Nguyễn Tiến Huy", "m", "T.Huy"),
+            ("Triết Trương", "m", "Triết"),
         ]
     },
 ]
 
-# 15 ties definition: (teamA_num, teamB_num, [ (pos, [sideA_p1, sideA_p2], [sideB_p1, sideB_p2]) ])
+# Matchups: 15 ties based on matrix
+# Using alias names that map to full names
 matchups = [
     # Đội 1 vs Đội 2
     (1, 2, [
@@ -187,6 +188,15 @@ matchups = [
     ]),
 ]
 
+# Map alias to variable name for each team
+alias_to_var = {}
+for t in teams_data:
+    t_num = t["num"]
+    for full_name, gender, alias in t["players"]:
+        safe_name = alias.replace(".", "_").replace(" ", "_").replace("-", "_")
+        var_name = f"v_p_{t_num}_{safe_name}"
+        alias_to_var[(t_num, alias)] = var_name
+
 sql_lines = []
 sql_lines.append("-- Seed script for Trusting Social Badminton Tournament")
 sql_lines.append(f"-- Tournament ID: {tournament_id}\n")
@@ -198,63 +208,53 @@ for i in range(1, 7):
     sql_lines.append(f"  v_team_{i} uuid;")
 for t in teams_data:
     t_num = t["num"]
-    for p_name, _ in t["players"]:
-        safe_p = p_name.replace(".", "_").replace(" ", "_")
-        sql_lines.append(f"  v_p_{t_num}_{safe_p} uuid;")
+    for full_name, gender, alias in t["players"]:
+        var_name = alias_to_var[(t_num, alias)]
+        sql_lines.append(f"  {var_name} uuid;")
 sql_lines.append("  v_tie_id uuid;")
 sql_lines.append("  v_rub_1 uuid; v_rub_2 uuid; v_rub_3 uuid;")
 sql_lines.append("BEGIN")
 
-# 1. Group
-sql_lines.append("\n  -- 1. Tạo hoặc lấy Bảng A")
-sql_lines.append("  SELECT id INTO v_group_id FROM public.tournament_groups WHERE tournament_id = v_tourney_id AND name = 'Bảng A' LIMIT 1;")
-sql_lines.append("  IF v_group_id IS NULL THEN")
-sql_lines.append("    INSERT INTO public.tournament_groups(tournament_id, name, sort_order)")
-sql_lines.append("    VALUES (v_tourney_id, 'Bảng A', 1)")
-sql_lines.append("    RETURNING id INTO v_group_id;")
-sql_lines.append("  END IF;\n")
+sql_lines.append("\n  -- 0. Xóa dữ liệu cũ của giải để seed lại hoàn toàn sạch sẽ")
+sql_lines.append("  DELETE FROM public.ties WHERE tournament_id = v_tourney_id;")
+sql_lines.append("  DELETE FROM public.teams WHERE tournament_id = v_tourney_id;")
+sql_lines.append("  DELETE FROM public.tournament_groups WHERE tournament_id = v_tourney_id;\n")
 
-# 2. Teams
-sql_lines.append("  -- 2. Tạo 6 Đội")
+# 1. Group
+sql_lines.append("  -- 1. Tạo Bảng A")
+sql_lines.append("  INSERT INTO public.tournament_groups(tournament_id, name, sort_order)")
+sql_lines.append("  VALUES (v_tourney_id, 'Bảng A', 1)")
+sql_lines.append("  RETURNING id INTO v_group_id;\n")
+
+# 2. Teams (seed = null)
+sql_lines.append("  -- 2. Tạo 6 Đội (Không hạt giống: seed = null)")
 for t in teams_data:
     num = t["num"]
     name = t["name"]
     short_name = t["short_name"]
     emoji = t["emoji"]
-    sql_lines.append(f"  SELECT id INTO v_team_{num} FROM public.teams WHERE tournament_id = v_tourney_id AND short_name = '{short_name}' LIMIT 1;")
-    sql_lines.append(f"  IF v_team_{num} IS NULL THEN")
-    sql_lines.append(f"    INSERT INTO public.teams(tournament_id, group_id, name, short_name, flag_emoji, seed)")
-    sql_lines.append(f"    VALUES (v_tourney_id, v_group_id, '{name}', '{short_name}', '{emoji}', {num})")
-    sql_lines.append(f"    RETURNING id INTO v_team_{num};")
-    sql_lines.append("  ELSE")
-    sql_lines.append(f"    UPDATE public.teams SET group_id = v_group_id, flag_emoji = '{emoji}', name = '{name}', seed = {num} WHERE id = v_team_{num};")
-    sql_lines.append("  END IF;")
+    sql_lines.append(f"  INSERT INTO public.teams(tournament_id, group_id, name, short_name, flag_emoji, seed)")
+    sql_lines.append(f"  VALUES (v_tourney_id, v_group_id, '{name}', '{short_name}', '{emoji}', null)")
+    sql_lines.append(f"  RETURNING id INTO v_team_{num};")
 
-# 3. Players
-sql_lines.append("\n  -- 3. Tạo Vận động viên cho từng đội")
+# 3. Players with full names and gender
+sql_lines.append("\n  -- 3. Tạo Vận động viên cho từng đội (Đầy đủ họ tên, giới tính)")
 for t in teams_data:
     t_num = t["num"]
     sql_lines.append(f"\n  -- VĐV Đội {t_num}")
-    for idx, (p_name, gender) in enumerate(t["players"]):
-        safe_p = p_name.replace(".", "_").replace(" ", "_")
-        var_name = f"v_p_{t_num}_{safe_p}"
-        sql_lines.append(f"  SELECT id INTO {var_name} FROM public.players WHERE tournament_id = v_tourney_id AND team_id = v_team_{t_num} AND full_name = '{p_name}' LIMIT 1;")
-        sql_lines.append(f"  IF {var_name} IS NULL THEN")
-        sql_lines.append(f"    INSERT INTO public.players(tournament_id, team_id, full_name, gender, sort_order)")
-        sql_lines.append(f"    VALUES (v_tourney_id, v_team_{t_num}, '{p_name}', '{gender}', {idx + 1})")
-        sql_lines.append(f"    RETURNING id INTO {var_name};")
-        sql_lines.append("  END IF;")
+    for idx, (full_name, gender, alias) in enumerate(t["players"]):
+        var_name = alias_to_var[(t_num, alias)]
+        sql_lines.append(f"  INSERT INTO public.players(tournament_id, team_id, full_name, gender, sort_order)")
+        sql_lines.append(f"  VALUES (v_tourney_id, v_team_{t_num}, '{full_name}', '{gender}', {idx + 1})")
+        sql_lines.append(f"  RETURNING id INTO {var_name};")
 
 # 4. Ties and Lineups
-sql_lines.append("\n  -- 4. Tạo 15 Trận đồng đội (Ties) và Lineup theo ma trận")
+sql_lines.append("\n  -- 4. Tạo 15 Trận đồng đội (Ties) và Lineup theo ma trận 3 sân song song")
 for tie_idx, (tA, tB, rubbers) in enumerate(matchups, 1):
     sql_lines.append(f"\n  -- Tie #{tie_idx}: Đội {tA} vs Đội {tB}")
-    sql_lines.append(f"  SELECT id INTO v_tie_id FROM public.ties WHERE tournament_id = v_tourney_id AND group_id = v_group_id AND ((team_a_id = v_team_{tA} AND team_b_id = v_team_{tB}) OR (team_a_id = v_team_{tB} AND team_b_id = v_team_{tA})) LIMIT 1;")
-    sql_lines.append("  IF v_tie_id IS NULL THEN")
-    sql_lines.append("    INSERT INTO public.ties(tournament_id, stage, group_id, round_label, round_order, team_a_id, team_b_id, court)")
-    sql_lines.append(f"    VALUES (v_tourney_id, 'group', v_group_id, 'Vòng bảng: Đội {tA} vs Đội {tB}', {tie_idx}, v_team_{tA}, v_team_{tB}, 'Sân 1, 2, 3')")
-    sql_lines.append("    RETURNING id INTO v_tie_id;")
-    sql_lines.append("  END IF;\n")
+    sql_lines.append("  INSERT INTO public.ties(tournament_id, stage, group_id, round_label, round_order, team_a_id, team_b_id, court)")
+    sql_lines.append(f"  VALUES (v_tourney_id, 'group', v_group_id, 'Vòng bảng: Đội {tA} vs Đội {tB}', {tie_idx}, v_team_{tA}, v_team_{tB}, 'Sân 1, 2, 3')")
+    sql_lines.append("  RETURNING id INTO v_tie_id;\n")
 
     # Update rubbers court
     sql_lines.append("  UPDATE public.rubbers SET court = 'Sân 1' WHERE tie_id = v_tie_id AND position = 1 RETURNING id INTO v_rub_1;")
@@ -266,19 +266,17 @@ for tie_idx, (tA, tB, rubbers) in enumerate(matchups, 1):
         rub_var = f"v_rub_{pos}"
         # Side A
         for p in sideA_players:
-            safe_p = p.replace(".", "_").replace(" ", "_")
-            p_var = f"v_p_{tA}_{safe_p}"
-            sql_lines.append(f"  INSERT INTO public.rubber_players(tournament_id, rubber_id, side, player_id) VALUES (v_tourney_id, {rub_var}, 'a', {p_var}) ON CONFLICT DO NOTHING;")
+            p_var = alias_to_var[(tA, p)]
+            sql_lines.append(f"  INSERT INTO public.rubber_players(tournament_id, rubber_id, side, player_id) VALUES (v_tourney_id, {rub_var}, 'a', {p_var});")
         # Side B
         for p in sideB_players:
-            safe_p = p.replace(".", "_").replace(" ", "_")
-            p_var = f"v_p_{tB}_{safe_p}"
-            sql_lines.append(f"  INSERT INTO public.rubber_players(tournament_id, rubber_id, side, player_id) VALUES (v_tourney_id, {rub_var}, 'b', {p_var}) ON CONFLICT DO NOTHING;")
+            p_var = alias_to_var[(tB, p)]
+            sql_lines.append(f"  INSERT INTO public.rubber_players(tournament_id, rubber_id, side, player_id) VALUES (v_tourney_id, {rub_var}, 'b', {p_var});")
 
-sql_lines.append("\n  RAISE NOTICE 'Đã seed thành công 6 đội, 36 vận động viên, 15 trận đồng đội và toàn bộ đội hình cho giải %!', v_tourney_id;")
+sql_lines.append("\n  RAISE NOTICE 'Đã cập nhật thành công 6 đội, 36 vận động viên chuẩn xác, bỏ hạt giống và tạo đầy đủ 15 trận cho giải %!', v_tourney_id;")
 sql_lines.append("END $$;")
 
 with open('supabase/seed_ts_tournament.sql', 'w', encoding='utf-8') as f:
     f.write('\n'.join(sql_lines) + '\n')
 
-print("Generated supabase/seed_ts_tournament.sql successfully!")
+print("Generated updated supabase/seed_ts_tournament.sql successfully!")
