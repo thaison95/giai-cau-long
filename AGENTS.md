@@ -8,6 +8,9 @@
 
 Làm đúng theo hai tài liệu này. Nếu thấy mâu thuẫn hoặc thiếu, **dừng lại và hỏi người dùng**, không tự thêm bảng/cột/tính năng.
 
+## Quy tắc bắt buộc
+- **Commit message phải viết bằng tiếng Anh** (tiêu đề ngắn dạng mệnh lệnh, phần mô tả nếu có cũng bằng tiếng Anh). Không viết commit message bằng tiếng Việt.
+
 ## Kiến trúc
 - **SPA thuần** (TanStack Start ở chế độ `spa`, không SSR), deploy lên **Cloudflare Pages**. Không có code chạy phía server.
 - Backend là **Supabase** (Postgres + Auth + Realtime), SPA gọi trực tiếp bằng `@supabase/supabase-js`. Bảo mật dựa vào **RLS và RPC** (xem file 01), không dựa vào việc ẩn UI.
