@@ -21,9 +21,6 @@ const badgeVariants = cva(
         live: "bg-live/10 text-live",
         win: "bg-win/10 text-win",
         warning: "bg-warning/10 text-warning",
-        live: "bg-live/10 text-live",
-        win: "bg-win/10 text-win",
-        warning: "bg-warning/10 text-warning",
       },
     },
     defaultVariants: {

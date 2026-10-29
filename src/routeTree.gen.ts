@@ -10,12 +10,34 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as RRouteImport } from './routes/r'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminTournamentsIdRouteImport } from './routes/admin/tournaments/$id'
+import { Route as AdminTournamentsNewRouteImport } from './routes/admin/tournaments/new'
+import { Route as AdminTournamentsIdIndexRouteImport } from './routes/admin/tournaments/$id/index'
+import { Route as AdminTournamentsIdGroupsRouteImport } from './routes/admin/tournaments/$id/groups'
+import { Route as AdminTournamentsIdMembersRouteImport } from './routes/admin/tournaments/$id/members'
+import { Route as AdminTournamentsIdRefereesRouteImport } from './routes/admin/tournaments/$id/referees'
+import { Route as AdminTournamentsIdSettingsRouteImport } from './routes/admin/tournaments/$id/settings'
+import { Route as AdminTournamentsIdTeamsRouteImport } from './routes/admin/tournaments/$id/teams'
+import { Route as AdminTournamentsIdTiesIndexRouteImport } from './routes/admin/tournaments/$id/ties/index'
+import { Route as AdminTournamentsIdTiesTieIdRouteImport } from './routes/admin/tournaments/$id/ties/$tieId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RRoute = RRouteImport.update({
@@ -24,39 +46,174 @@ const RRoute = RRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
+const AdminTournamentsIdRoute = AdminTournamentsIdRouteImport.update({
+  id: '/tournaments/$id',
+  path: '/tournaments/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTournamentsNewRoute = AdminTournamentsNewRouteImport.update({
+  id: '/tournaments/new',
+  path: '/tournaments/new',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTournamentsIdIndexRoute = AdminTournamentsIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminTournamentsIdRoute,
+} as any)
+const AdminTournamentsIdGroupsRoute =
+  AdminTournamentsIdGroupsRouteImport.update({
+    id: '/groups',
+    path: '/groups',
+    getParentRoute: () => AdminTournamentsIdRoute,
+  } as any)
+const AdminTournamentsIdMembersRoute =
+  AdminTournamentsIdMembersRouteImport.update({
+    id: '/members',
+    path: '/members',
+    getParentRoute: () => AdminTournamentsIdRoute,
+  } as any)
+const AdminTournamentsIdRefereesRoute =
+  AdminTournamentsIdRefereesRouteImport.update({
+    id: '/referees',
+    path: '/referees',
+    getParentRoute: () => AdminTournamentsIdRoute,
+  } as any)
+const AdminTournamentsIdSettingsRoute =
+  AdminTournamentsIdSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AdminTournamentsIdRoute,
+  } as any)
+const AdminTournamentsIdTeamsRoute = AdminTournamentsIdTeamsRouteImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => AdminTournamentsIdRoute,
+} as any)
+const AdminTournamentsIdTiesIndexRoute =
+  AdminTournamentsIdTiesIndexRouteImport.update({
+    id: '/ties/',
+    path: '/ties/',
+    getParentRoute: () => AdminTournamentsIdRoute,
+  } as any)
+const AdminTournamentsIdTiesTieIdRoute =
+  AdminTournamentsIdTiesTieIdRouteImport.update({
+    id: '/ties/$tieId',
+    path: '/ties/$tieId',
+    getParentRoute: () => AdminTournamentsIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/login': typeof LoginRoute
   '/r': typeof RRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/tournaments/$id': typeof AdminTournamentsIdRouteWithChildren
+  '/admin/tournaments/new': typeof AdminTournamentsNewRoute
+  '/admin/tournaments/$id/groups': typeof AdminTournamentsIdGroupsRoute
+  '/admin/tournaments/$id/members': typeof AdminTournamentsIdMembersRoute
+  '/admin/tournaments/$id/referees': typeof AdminTournamentsIdRefereesRoute
+  '/admin/tournaments/$id/settings': typeof AdminTournamentsIdSettingsRoute
+  '/admin/tournaments/$id/teams': typeof AdminTournamentsIdTeamsRoute
+  '/admin/tournaments/$id/': typeof AdminTournamentsIdIndexRoute
+  '/admin/tournaments/$id/ties/$tieId': typeof AdminTournamentsIdTiesTieIdRoute
+  '/admin/tournaments/$id/ties/': typeof AdminTournamentsIdTiesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/r': typeof RRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/tournaments/new': typeof AdminTournamentsNewRoute
+  '/admin/tournaments/$id/groups': typeof AdminTournamentsIdGroupsRoute
+  '/admin/tournaments/$id/members': typeof AdminTournamentsIdMembersRoute
+  '/admin/tournaments/$id/referees': typeof AdminTournamentsIdRefereesRoute
+  '/admin/tournaments/$id/settings': typeof AdminTournamentsIdSettingsRoute
+  '/admin/tournaments/$id/teams': typeof AdminTournamentsIdTeamsRoute
+  '/admin/tournaments/$id': typeof AdminTournamentsIdIndexRoute
+  '/admin/tournaments/$id/ties/$tieId': typeof AdminTournamentsIdTiesTieIdRoute
+  '/admin/tournaments/$id/ties': typeof AdminTournamentsIdTiesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/login': typeof LoginRoute
   '/r': typeof RRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/tournaments/$id': typeof AdminTournamentsIdRouteWithChildren
+  '/admin/tournaments/new': typeof AdminTournamentsNewRoute
+  '/admin/tournaments/$id/groups': typeof AdminTournamentsIdGroupsRoute
+  '/admin/tournaments/$id/members': typeof AdminTournamentsIdMembersRoute
+  '/admin/tournaments/$id/referees': typeof AdminTournamentsIdRefereesRoute
+  '/admin/tournaments/$id/settings': typeof AdminTournamentsIdSettingsRoute
+  '/admin/tournaments/$id/teams': typeof AdminTournamentsIdTeamsRoute
+  '/admin/tournaments/$id/': typeof AdminTournamentsIdIndexRoute
+  '/admin/tournaments/$id/ties/$tieId': typeof AdminTournamentsIdTiesTieIdRoute
+  '/admin/tournaments/$id/ties/': typeof AdminTournamentsIdTiesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/r' | '/admin/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/login'
+    | '/r'
+    | '/admin/'
+    | '/admin/tournaments/$id'
+    | '/admin/tournaments/new'
+    | '/admin/tournaments/$id/groups'
+    | '/admin/tournaments/$id/members'
+    | '/admin/tournaments/$id/referees'
+    | '/admin/tournaments/$id/settings'
+    | '/admin/tournaments/$id/teams'
+    | '/admin/tournaments/$id/'
+    | '/admin/tournaments/$id/ties/$tieId'
+    | '/admin/tournaments/$id/ties/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/r' | '/admin'
-  id: '__root__' | '/' | '/r' | '/admin/'
+  to:
+    | '/'
+    | '/login'
+    | '/r'
+    | '/admin'
+    | '/admin/tournaments/new'
+    | '/admin/tournaments/$id/groups'
+    | '/admin/tournaments/$id/members'
+    | '/admin/tournaments/$id/referees'
+    | '/admin/tournaments/$id/settings'
+    | '/admin/tournaments/$id/teams'
+    | '/admin/tournaments/$id'
+    | '/admin/tournaments/$id/ties/$tieId'
+    | '/admin/tournaments/$id/ties'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/login'
+    | '/r'
+    | '/admin/'
+    | '/admin/tournaments/$id'
+    | '/admin/tournaments/new'
+    | '/admin/tournaments/$id/groups'
+    | '/admin/tournaments/$id/members'
+    | '/admin/tournaments/$id/referees'
+    | '/admin/tournaments/$id/settings'
+    | '/admin/tournaments/$id/teams'
+    | '/admin/tournaments/$id/'
+    | '/admin/tournaments/$id/ties/$tieId'
+    | '/admin/tournaments/$id/ties/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  LoginRoute: typeof LoginRoute
   RRoute: typeof RRoute
-  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,6 +225,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/r': {
       id: '/r'
       path: '/r'
@@ -77,18 +248,128 @@ declare module '@tanstack/react-router' {
     }
     '/admin/': {
       id: '/admin/'
-      path: '/admin'
+      path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tournaments/$id': {
+      id: '/admin/tournaments/$id'
+      path: '/tournaments/$id'
+      fullPath: '/admin/tournaments/$id'
+      preLoaderRoute: typeof AdminTournamentsIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tournaments/new': {
+      id: '/admin/tournaments/new'
+      path: '/tournaments/new'
+      fullPath: '/admin/tournaments/new'
+      preLoaderRoute: typeof AdminTournamentsNewRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tournaments/$id/': {
+      id: '/admin/tournaments/$id/'
+      path: '/'
+      fullPath: '/admin/tournaments/$id/'
+      preLoaderRoute: typeof AdminTournamentsIdIndexRouteImport
+      parentRoute: typeof AdminTournamentsIdRoute
+    }
+    '/admin/tournaments/$id/groups': {
+      id: '/admin/tournaments/$id/groups'
+      path: '/groups'
+      fullPath: '/admin/tournaments/$id/groups'
+      preLoaderRoute: typeof AdminTournamentsIdGroupsRouteImport
+      parentRoute: typeof AdminTournamentsIdRoute
+    }
+    '/admin/tournaments/$id/members': {
+      id: '/admin/tournaments/$id/members'
+      path: '/members'
+      fullPath: '/admin/tournaments/$id/members'
+      preLoaderRoute: typeof AdminTournamentsIdMembersRouteImport
+      parentRoute: typeof AdminTournamentsIdRoute
+    }
+    '/admin/tournaments/$id/referees': {
+      id: '/admin/tournaments/$id/referees'
+      path: '/referees'
+      fullPath: '/admin/tournaments/$id/referees'
+      preLoaderRoute: typeof AdminTournamentsIdRefereesRouteImport
+      parentRoute: typeof AdminTournamentsIdRoute
+    }
+    '/admin/tournaments/$id/settings': {
+      id: '/admin/tournaments/$id/settings'
+      path: '/settings'
+      fullPath: '/admin/tournaments/$id/settings'
+      preLoaderRoute: typeof AdminTournamentsIdSettingsRouteImport
+      parentRoute: typeof AdminTournamentsIdRoute
+    }
+    '/admin/tournaments/$id/teams': {
+      id: '/admin/tournaments/$id/teams'
+      path: '/teams'
+      fullPath: '/admin/tournaments/$id/teams'
+      preLoaderRoute: typeof AdminTournamentsIdTeamsRouteImport
+      parentRoute: typeof AdminTournamentsIdRoute
+    }
+    '/admin/tournaments/$id/ties/': {
+      id: '/admin/tournaments/$id/ties/'
+      path: '/ties'
+      fullPath: '/admin/tournaments/$id/ties/'
+      preLoaderRoute: typeof AdminTournamentsIdTiesIndexRouteImport
+      parentRoute: typeof AdminTournamentsIdRoute
+    }
+    '/admin/tournaments/$id/ties/$tieId': {
+      id: '/admin/tournaments/$id/ties/$tieId'
+      path: '/ties/$tieId'
+      fullPath: '/admin/tournaments/$id/ties/$tieId'
+      preLoaderRoute: typeof AdminTournamentsIdTiesTieIdRouteImport
+      parentRoute: typeof AdminTournamentsIdRoute
     }
   }
 }
 
+interface AdminTournamentsIdRouteChildren {
+  AdminTournamentsIdGroupsRoute: typeof AdminTournamentsIdGroupsRoute
+  AdminTournamentsIdMembersRoute: typeof AdminTournamentsIdMembersRoute
+  AdminTournamentsIdRefereesRoute: typeof AdminTournamentsIdRefereesRoute
+  AdminTournamentsIdSettingsRoute: typeof AdminTournamentsIdSettingsRoute
+  AdminTournamentsIdTeamsRoute: typeof AdminTournamentsIdTeamsRoute
+  AdminTournamentsIdIndexRoute: typeof AdminTournamentsIdIndexRoute
+  AdminTournamentsIdTiesTieIdRoute: typeof AdminTournamentsIdTiesTieIdRoute
+  AdminTournamentsIdTiesIndexRoute: typeof AdminTournamentsIdTiesIndexRoute
+}
+
+const AdminTournamentsIdRouteChildren: AdminTournamentsIdRouteChildren = {
+  AdminTournamentsIdGroupsRoute: AdminTournamentsIdGroupsRoute,
+  AdminTournamentsIdMembersRoute: AdminTournamentsIdMembersRoute,
+  AdminTournamentsIdRefereesRoute: AdminTournamentsIdRefereesRoute,
+  AdminTournamentsIdSettingsRoute: AdminTournamentsIdSettingsRoute,
+  AdminTournamentsIdTeamsRoute: AdminTournamentsIdTeamsRoute,
+  AdminTournamentsIdIndexRoute: AdminTournamentsIdIndexRoute,
+  AdminTournamentsIdTiesTieIdRoute: AdminTournamentsIdTiesTieIdRoute,
+  AdminTournamentsIdTiesIndexRoute: AdminTournamentsIdTiesIndexRoute,
+}
+
+const AdminTournamentsIdRouteWithChildren =
+  AdminTournamentsIdRoute._addFileChildren(AdminTournamentsIdRouteChildren)
+
+interface AdminRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminTournamentsIdRoute: typeof AdminTournamentsIdRouteWithChildren
+  AdminTournamentsNewRoute: typeof AdminTournamentsNewRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+  AdminTournamentsIdRoute: AdminTournamentsIdRouteWithChildren,
+  AdminTournamentsNewRoute: AdminTournamentsNewRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  LoginRoute: LoginRoute,
   RRoute: RRoute,
-  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

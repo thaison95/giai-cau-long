@@ -11,6 +11,7 @@ import Header from '../components/Header'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { AuthProvider } from '@/lib/auth'
 
 import appCss from '../styles.css?url'
 
@@ -55,12 +56,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="font-sans antialiased [overflow-wrap:anywhere]">
-        <TooltipProvider>
-          <Header />
-          {children}
-          <Footer />
-          <Toaster />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Header />
+            {children}
+            <Footer />
+            <Toaster />
+          </TooltipProvider>
+        </AuthProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',
