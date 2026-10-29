@@ -123,58 +123,58 @@ M0 và M1 làm song song được (UI và database độc lập).
 
 > Phụ thuộc chung: M0 và M1 xong.
 
-### M2-1 Đăng nhập và route guard (M)
+### M2-1 Đăng nhập và route guard (M) — ✅ Hoàn thành
 - **Việc:** trang `/login` (magic link, thông báo "Kiểm tra email của bạn"); callback xử lý phiên; guard cho `/admin/**` chuyển về `/login` khi chưa đăng nhập; nút đăng xuất.
 - **Nghiệm thu:** chưa đăng nhập vào `/admin` bị chuyển; đăng nhập xong quay lại đúng trang đang vào; refresh vẫn giữ phiên.
 - **Tham chiếu:** 02 §4.3.
 
-### M2-2 Danh sách giải và tạo giải (M)
+### M2-2 Danh sách giải và tạo giải (M) — ✅ Hoàn thành
 - **Việc:** `/admin` (danh sách giải của tôi, `Empty` khi chưa có); `/admin/tournaments/new` với slug gợi ý và kiểm tra trùng, luật mặc định điền sẵn, mẫu rubber 5 ô Đơn/Đôi; validate theo check ở 01 §3.1.
 - **Nghiệm thu:** tạo giải xong người tạo tự là organizer; slug sai định dạng hoặc trùng bị từ chối với thông báo tiếng Việt.
 
-### M2-3 Layout trang quản trị giải (S)
+### M2-3 Layout trang quản trị giải (S) — ✅ Hoàn thành
 - **Phụ thuộc:** M2-2.
 - **Việc:** `/admin/tournaments/$id` dùng `Sidebar` (mobile: `Sheet` hoặc tab dưới); 7 mục điều hướng; trang Tổng quan hiển thị trạng thái và số liệu cơ bản.
 - **Nghiệm thu:** vào giải của organizer khác hiển thị như không tìm thấy.
 
-### M2-4 Quản lý đội và VĐV (M)
+### M2-4 Quản lý đội và VĐV (M) — ✅ Hoàn thành
 - **Phụ thuộc:** M2-3.
 - **Việc:** CRUD đội (`name`, `short_name` ≤ 4 ký tự, cờ emoji); CRUD VĐV; thêm nhanh nhiều VĐV bằng cách dán danh sách mỗi dòng một tên.
 - **Nghiệm thu:** `short_name` trùng bị từ chối; xóa đội xóa luôn VĐV và có hộp xác nhận.
 
-### M2-5 Bảng đấu (S)
+### M2-5 Bảng đấu (S) — ✅ Hoàn thành
 - **Phụ thuộc:** M2-4.
 - **Việc:** tạo, sửa, xóa bảng; xếp đội vào bảng.
 - **Nghiệm thu:** xóa bảng làm `group_id` của đội thành null, không xóa đội.
 
-### M2-6 Quản lý tie và tạo vòng tròn (L)
+### M2-6 Quản lý tie và tạo vòng tròn (L) — ✅ Hoàn thành
 - **Phụ thuộc:** M2-5.
 - **Việc:** danh sách tie; form tạo/sửa tie (giai đoạn, bảng, nhãn vòng, hai đội — cho phép để trống ở vòng loại trực tiếp, giờ, sân); nút "Tạo tự động vòng tròn cho một bảng" sinh mọi cặp trong bảng, bỏ qua cặp đã tồn tại.
 - **Nghiệm thu:** bảng 4 đội sinh 6 tie, mỗi tie có 5 rubber; chạy lại không tạo trùng; không sửa được các cột hệ thống của tie.
 - **Tham chiếu:** 02 §4.3, 01 §3.6.
 
-### M2-7 Trọng tài: tạo, link, xóa (M)
+### M2-7 Trọng tài: tạo, link, xóa (M) — ✅ Hoàn thành
 - **Phụ thuộc:** M2-3.
 - **Việc:** `/admin/tournaments/$id/referees`; thêm trọng tài chỉ cần nhập tên; `RefereeLinkCard` (sao chép link, Web Share API, xóa qua `alert-dialog`); link dạng `<origin>/r/<token>`.
 - **Nghiệm thu:** token chỉ hiển thị ở trang này (organizer); xóa trọng tài khiến link cũ vô hiệu.
 - **Tham chiếu:** 02 §3.2, 01 §3.10–3.11.
 
-### M2-8 Đội hình và gán trọng tài cho rubber (L)
+### M2-8 Đội hình và gán trọng tài cho rubber (L) — ✅ Hoàn thành
 - **Phụ thuộc:** M2-6, M2-7.
 - **Việc:** `/admin/tournaments/$id/ties/$tieId`; `LineupPicker` cho từng rubber (đơn 1 người, đôi 2 người, lọc theo đội, báo lỗi thiếu/sai số lượng); gán trọng tài từng rubber và nút "Gán cho tất cả"; sửa sân và giờ từng rubber.
 - **Nghiệm thu:** không chọn được VĐV của đội khác; lỗi từ trigger hiển thị bằng tiếng Việt.
 
-### M2-9 Thành viên ban tổ chức (S)
+### M2-9 Thành viên ban tổ chức (S) — ✅ Hoàn thành
 - **Phụ thuộc:** M2-3.
 - **Việc:** danh sách organizer; thêm bằng email qua `add_organizer_by_email`; xóa (không xóa được người cuối cùng); thông báo `user_not_found` rõ ràng.
 - **Nghiệm thu:** organizer mới thấy và sửa được giải; người cuối cùng không bị xóa.
 
-### M2-10 Cài đặt giải: công khai và kết thúc (M)
+### M2-10 Cài đặt giải: công khai và kết thúc (M) — ✅ Hoàn thành
 - **Phụ thuộc:** M2-3.
 - **Việc:** sửa thông tin giải; nút **Công khai giải** (`draft → published`, có xác nhận); nút **Kết thúc giải** qua `finish_tournament` với `alert-dialog` nêu rõ sẽ xóa mọi trọng tài và link.
 - **Nghiệm thu:** sau khi kết thúc, danh sách trọng tài trống và link cũ trả "Link không còn hiệu lực".
 
-### M2-11 Ánh xạ lỗi RPC và toast (S)
+### M2-11 Ánh xạ lỗi RPC và toast (S) — ✅ Hoàn thành
 - **Việc:** hàm dùng chung chuyển mã lỗi (`forbidden`, `invalid_token`, `user_not_found`…) sang câu tiếng Việt; toast `sonner`; không bao giờ hiện lỗi thô của Postgres.
 - **Nghiệm thu:** mọi form quản trị dùng chung hàm này.
 - **Tham chiếu:** 02 §7. *Nên làm sớm trong M2 vì các ticket khác dùng.*
