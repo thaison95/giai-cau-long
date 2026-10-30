@@ -17,7 +17,12 @@ function AdminRouteGuard() {
 	const location = useLocation();
 
 	React.useEffect(() => {
-		if (!loading && !user) {
+		if (
+			!loading &&
+			!user &&
+			(location.pathname === "/admin" ||
+				location.pathname.startsWith("/admin/"))
+		) {
 			// Lưu lại URL hiện tại để sau khi đăng nhập xong thì quay lại đúng trang này
 			const currentUrl = location.href;
 			navigate({
@@ -27,7 +32,7 @@ function AdminRouteGuard() {
 				},
 			});
 		}
-	}, [user, loading, navigate, location.href]);
+	}, [user, loading, navigate, location.href, location.pathname]);
 
 	if (loading) {
 		return (

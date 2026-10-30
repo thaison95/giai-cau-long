@@ -27,6 +27,9 @@ type Scope =
 type Row = Tie | Rubber | Game;
 type Table = "ties" | "rubbers" | "games";
 
+// Channel names only need to be unique within this client, not cryptographically random.
+let channelSequence = 0;
+
 function replaceRow<T extends { id: string }>(items: T[], row: T): T[] {
 	const index = items.findIndex((item) => item.id === row.id);
 	if (index === -1) return [...items, row];
@@ -152,7 +155,7 @@ export function useRealtime(scope: Scope | null) {
 			}
 		};
 		const channel = supabase.channel(
-			`m5:${kind}:${tournamentId ?? tieId ?? "all"}:${crypto.randomUUID()}`,
+			`m5:${kind}:${tournamentId ?? tieId ?? "all"}:${Date.now()}-${++channelSequence}`,
 		);
 		const tieFilter =
 			kind === "home"
