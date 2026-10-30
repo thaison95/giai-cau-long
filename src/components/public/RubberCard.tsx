@@ -1,6 +1,7 @@
 import { CheckIcon, MapPinIcon } from "lucide-react";
 import * as React from "react";
 import { LiveBadge } from "@/components/public/LiveBadge";
+import { ScoreValue } from "@/components/public/ScoreValue";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import type { Database } from "@/lib/database.types";
@@ -54,7 +55,13 @@ export function RubberCard({
 		return rubber.kind;
 	}, [rubber.kind, rubber.players_a, isMixed]);
 
-	const games = (rubber.games ?? []).sort((g1, g2) => g1.game_no - g2.game_no);
+	const games = [...(rubber.games ?? [])].sort(
+		(g1, g2) => g1.game_no - g2.game_no,
+	);
+
+	const currentGame = games.find(
+		(game) => game.game_no === rubber.current_game,
+	);
 
 	// Format danh sách tên VĐV
 	const formatPlayerNames = (players?: Player[]) => {
@@ -190,6 +197,23 @@ export function RubberCard({
 						</span>
 					</div>
 
+					{isLive && games.length > 0 && (
+						<span className="sr-only" aria-live="polite">
+							{teamAName} {games[games.length - 1].score_a}, {teamBName}{" "}
+							{games[games.length - 1].score_b}
+						</span>
+					)}
+
+					{isLive && currentGame && (
+						<div className="flex items-center gap-2 font-heading text-3xl font-bold tabular-nums">
+							<ScoreValue value={currentGame.score_a} className="text-team-a" />
+							<span aria-hidden="true" className="text-muted-foreground">
+								–
+							</span>
+							<ScoreValue value={currentGame.score_b} className="text-team-b" />
+						</div>
+					)}
+
 					{/* Điểm ván chi tiết */}
 					{games.length > 0 && (
 						<div className="flex flex-wrap items-center justify-center gap-1 mt-1 text-[10px] font-mono text-muted-foreground">
@@ -202,7 +226,8 @@ export function RubberCard({
 										g.winner_side === "b" && "text-team-b font-medium",
 									)}
 								>
-									{g.score_a}–{g.score_b}
+									<ScoreValue value={g.score_a} />–
+									<ScoreValue value={g.score_b} />
 								</span>
 							))}
 						</div>

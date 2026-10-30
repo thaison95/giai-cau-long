@@ -2,6 +2,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeftIcon, WifiOffIcon } from "lucide-react";
 import * as React from "react";
+import { ConnectionStatus } from "@/components/public/ConnectionStatus";
+import { ScoreValue } from "@/components/public/ScoreValue";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -15,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useRealtime } from "@/hooks/use-realtime";
 import type { Database } from "@/lib/database.types";
 import { showRpcError, toastSuccess } from "@/lib/rpc-errors";
 import { supabase } from "@/lib/supabase";
@@ -112,8 +115,13 @@ export function RubberScoringScreen({
 				playersB: names("b"),
 			};
 		},
-		refetchInterval: 2_000,
 	});
+
+	const connected = useRealtime(
+		data?.rubber.tie_id
+			? { kind: "scoring", tieId: data.rubber.tie_id, rubberId }
+			: null,
+	);
 
 	React.useEffect(() => {
 		const update = () => setOnline(navigator.onLine);
@@ -338,6 +346,7 @@ export function RubberScoringScreen({
 					</div>
 				</div>
 			</div>
+			<ConnectionStatus connected={connected} />
 			{!online && (
 				<div
 					role="alert"
@@ -411,6 +420,9 @@ export function RubberScoringScreen({
 			)}
 			{rubber.status === "live" && (
 				<div className="grid gap-3">
+					<span className="sr-only" aria-live="polite">
+						{data.teamA} {score.a}, {data.teamB} {score.b}
+					</span>
 					<div className="grid min-h-[38vh] grid-cols-2 gap-3">
 						<ScoreSide
 							side="a"
@@ -571,9 +583,10 @@ function ScoreSide({
 			<span className="text-xs text-muted-foreground">
 				{players.join(" / ")}
 			</span>
-			<span className="font-mono text-7xl font-extrabold tabular-nums sm:text-9xl">
-				{score}
-			</span>
+			<ScoreValue
+				value={score}
+				className="font-mono text-7xl font-extrabold tabular-nums sm:text-9xl"
+			/>
 		</button>
 	);
 }

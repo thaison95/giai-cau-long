@@ -237,22 +237,23 @@ M0 và M1 làm song song được (UI và database độc lập).
 
 ---
 
-## M5 — Realtime
+## M5 — Realtime — ✅ Hoàn thành
 
 > Phụ thuộc chung: M3 và M4 xong.
 
-### M5-1 Hook subscribe và cập nhật cache (L)
+### M5-1 Hook subscribe và cập nhật cache (L) — ✅ Hoàn thành
 - **Việc:** hook dùng `postgres_changes` cho `ties`, `rubbers`, `games` lọc theo `tournament_id`/`tie_id`; cập nhật bằng `setQueryData`; hủy subscribe khi rời trang; refetch toàn bộ khi kết nối lại hoặc khi tab được focus lại.
 - **Nghiệm thu:** mở hai trình duyệt, chấm ở một bên thì bên kia đổi điểm trong khoảng 1–2 giây; tắt rồi bật mạng thì dữ liệu tự đồng bộ; không rò rỉ subscription khi chuyển trang.
 - **Tham chiếu:** 01 §6.
+- **Kết quả:** hai trình duyệt cập nhật khoảng 0,8 giây trong một lần thử; một lần chạy tải cao mất 6,57 giây. Người dùng chấp nhận trạng thái hiện tại.
 
-### M5-2 ConnectionStatus và hiệu ứng điểm (M)
+### M5-2 ConnectionStatus và hiệu ứng điểm (M) — ✅ Hoàn thành
 - **Phụ thuộc:** M5-1.
 - **Việc:** `ConnectionStatus` hai trạng thái; khi mất kết nối **không xóa điểm đang hiển thị**; số điểm nháy sáng ~600ms khi đổi; vùng `aria-live="polite"` thông báo ngắn "Đội A 12, đội B 10"; tôn trọng `prefers-reduced-motion`.
 - **Nghiệm thu:** bật giảm chuyển động thì nháy sáng và nhấp nháy tắt.
 - **Tham chiếu:** 02 §2.6, §8.
 
-### M5-3 Realtime cho màn chấm điểm và trang giải (S)
+### M5-3 Realtime cho màn chấm điểm và trang giải (S) — ✅ Hoàn thành
 - **Phụ thuộc:** M5-1.
 - **Việc:** màn chấm điểm tự cập nhật khi người khác chấm thay; tab Trực tiếp và Lịch đấu, trang chủ cập nhật trạng thái live (cập nhật đồng thời 3 sân thi đấu song song mượt mà).
 - **Nghiệm thu:** rubber vừa bắt đầu xuất hiện ở tab Trực tiếp không cần tải lại trang.

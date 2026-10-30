@@ -25,6 +25,7 @@ import {
 	type PublicTournamentItem,
 	usePublicTournaments,
 } from "@/hooks/use-public-queries";
+import { useRealtime } from "@/hooks/use-realtime";
 import { formatDate } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -32,6 +33,7 @@ export const Route = createFileRoute("/")({
 });
 
 function HomePage() {
+	useRealtime({ kind: "home" });
 	const {
 		data: tournaments,
 		isLoading,

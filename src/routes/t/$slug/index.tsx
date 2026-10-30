@@ -11,6 +11,7 @@ import {
 	UsersIcon,
 } from "lucide-react";
 import * as React from "react";
+import { ConnectionStatus } from "@/components/public/ConnectionStatus";
 import { LiveBadge } from "@/components/public/LiveBadge";
 import { StandingsTable } from "@/components/public/StandingsTable";
 import { TeamName } from "@/components/public/TeamName";
@@ -29,6 +30,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { usePublicTournamentData } from "@/hooks/use-public-queries";
+import { useRealtime } from "@/hooks/use-realtime";
 import type { Database } from "@/lib/database.types";
 import { cn, formatDate } from "@/lib/utils";
 import { useTournamentPublic } from "../$slug";
@@ -43,6 +45,10 @@ export const Route = createFileRoute("/t/$slug/")({
 
 function TournamentPublicPage() {
 	const { tournament } = useTournamentPublic();
+	const connected = useRealtime({
+		kind: "tournament",
+		tournamentId: tournament.id,
+	});
 	const { data: tourneyData, isLoading } = usePublicTournamentData(
 		tournament.id,
 	);
@@ -165,6 +171,7 @@ function TournamentPublicPage() {
 
 	return (
 		<main className="mx-auto min-h-[80vh] max-w-5xl px-4 py-6 md:px-6 md:py-10">
+			<ConnectionStatus connected={connected} />
 			{/* Breadcrumb / Back button */}
 			<div className="mb-4">
 				<Button

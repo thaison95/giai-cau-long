@@ -7,6 +7,7 @@ import {
 	TrophyIcon,
 } from "lucide-react";
 import * as React from "react";
+import { ConnectionStatus } from "@/components/public/ConnectionStatus";
 import { LiveBadge } from "@/components/public/LiveBadge";
 import { RubberCard } from "@/components/public/RubberCard";
 import { TeamName } from "@/components/public/TeamName";
@@ -15,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePublicTieDetails } from "@/hooks/use-public-queries";
+import { useRealtime } from "@/hooks/use-realtime";
 import { cn, formatDateTime } from "@/lib/utils";
 import { useTournamentPublic } from "../../$slug";
 
@@ -25,7 +27,8 @@ export const Route = createFileRoute("/t/$slug/ties/$tieId")({
 function TieDetailPage() {
 	const { tournament } = useTournamentPublic();
 	const { tieId } = Route.useParams();
-	const { data: tie, isLoading, error } = usePublicTieDetails(tieId);
+	const connected = useRealtime({ kind: "tie", tieId });
+	const { data: tie, isLoading } = usePublicTieDetails(tieId);
 
 	// Ref để tự động cuộn (auto-scroll) tới rubber đang live khi mở trang lần đầu
 	const liveRubberRef = React.useRef<HTMLDivElement | null>(null);
@@ -72,7 +75,7 @@ function TieDetailPage() {
 		);
 	}
 
-	if (error || !tie) {
+	if (!tie) {
 		return (
 			<main className="mx-auto grid min-h-[70vh] max-w-4xl place-content-center px-4 text-center">
 				<div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-none bg-muted text-muted-foreground">
@@ -101,6 +104,7 @@ function TieDetailPage() {
 
 	return (
 		<main className="mx-auto min-h-[80vh] max-w-4xl px-4 py-6 md:px-6 md:py-10">
+			<ConnectionStatus connected={connected} />
 			{/* Breadcrumb quay lại giải đấu */}
 			<div className="mb-4">
 				<Button
