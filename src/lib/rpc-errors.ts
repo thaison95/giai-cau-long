@@ -22,6 +22,7 @@ const ERROR_CODE_MAP: Record<string, string> = {
 	invalid_rubber_order: "Thứ tự trận đấu không hợp lệ.",
 	invalid_status: "Trạng thái trận đấu hiện tại không hợp lệ cho thao tác này.",
 	rubber_not_found: "Không tìm thấy trận đấu yêu cầu.",
+	rubber_not_reopenable: "Không thể mở lại trận đấu này.",
 	teams_required: "Cần xác định đủ hai đội tham gia trước khi bắt đầu trận.",
 
 	// Đội hình (Lineup)

@@ -253,6 +253,13 @@ export function RubberCard({
 				</div>
 			</div>
 
+			{isFinished && rubber.end_reason === "retired" && rubber.winner_side && (
+				<p className="mt-2 text-center text-xs text-muted-foreground">
+					{rubber.winner_side === "a" ? teamAName : teamBName} thắng do đối
+					phương bỏ cuộc. Tỉ số ván là số ván đã hoàn tất.
+				</p>
+			)}
+
 			{/* Ghi chú khi skipped */}
 			{isSkipped && !playAllRubbers && (
 				<div className="mt-2 text-[11px] text-muted-foreground text-center italic">

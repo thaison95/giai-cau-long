@@ -254,9 +254,7 @@ function AdminTieDetailPage() {
 			});
 
 			if (error) throw error;
-			toastSuccess(
-				"Đã mở lại trận đấu thành công. Điểm số đã lùi 1 điểm để tiếp tục thi đấu.",
-			);
+			toastSuccess("Đã mở lại trận đấu để tiếp tục thi đấu.");
 			refetch();
 		} catch (err) {
 			showRpcError(err);
@@ -808,14 +806,18 @@ function RubberAdminCard({
 						</Button>
 					)}
 
-					{rubber.status === "finished" && (
+					{rubber.status === "finished" && rubber.end_reason !== "walkover" && (
 						<Button
 							variant="outline"
 							size="xs"
 							onClick={onReopen}
 							disabled={isReopening}
 							className="text-[11px] h-6 text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
-							title="Mở lại trận đấu để chỉnh sửa điểm khi bấm nhầm điểm kết thúc (lùi 1 điểm để tiếp tục thi đấu)"
+							title={
+								rubber.end_reason === "retired"
+									? "Mở lại trận và giữ nguyên điểm hiện tại"
+									: "Mở lại trận và lùi điểm kết thúc"
+							}
 						>
 							<RotateCcwIcon className="size-3 mr-1" />
 							{isReopening ? "Đang mở lại..." : "Mở lại trận"}

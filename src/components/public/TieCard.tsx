@@ -166,6 +166,11 @@ export function TieCard({
 										{r.status === "finished" && (
 											<span className="font-bold">
 												({r.games_won_a}–{r.games_won_b})
+												{r.end_reason === "retired" && r.winner_side && (
+													<span className="ml-1 font-sans font-normal">
+														{r.winner_side === "a" ? "A" : "B"} thắng do bỏ cuộc
+													</span>
+												)}
 											</span>
 										)}
 									</span>

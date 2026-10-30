@@ -491,8 +491,13 @@ export function RubberScoringScreen({
 					<p className="font-mono text-4xl font-bold">
 						{rubber.winner_side === "a" ? data.teamA : data.teamB} thắng
 					</p>
+					{rubber.end_reason === "retired" && (
+						<p className="text-sm text-muted-foreground">
+							Thắng do đối phương bỏ cuộc. Tỉ số ván là số ván đã hoàn tất.
+						</p>
+					)}
 					<p className="text-sm text-muted-foreground">
-						Số game: {gamesWon}
+						Số ván: {gamesWon}
 						{currentGame
 							? ` · Ván cuối ${currentGame.score_a}–${currentGame.score_b}`
 							: ""}
