@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeftIcon, WifiOffIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowLeftRightIcon, WifiOffIcon } from "lucide-react";
 import * as React from "react";
 import { ConnectionStatus } from "@/components/public/ConnectionStatus";
 import { ScoreValue } from "@/components/public/ScoreValue";
@@ -41,6 +41,11 @@ export function RubberScoringScreen({
 		typeof navigator === "undefined" ? true : navigator.onLine,
 	);
 	const [endDialog, setEndDialog] = React.useState(false);
+	const [sideOrder, setSideOrder] = React.useState({
+		rubberId,
+		swapped: false,
+	});
+	const sidesSwapped = sideOrder.rubberId === rubberId && sideOrder.swapped;
 	const [earlyWinner, setEarlyWinner] = React.useState<Side>("a");
 	const [busy, setBusy] = React.useState(false);
 	const [optimistic, setOptimistic] = React.useState<{
@@ -321,6 +326,11 @@ export function RubberScoringScreen({
 		);
 	const { rubber } = data;
 	const gamesWon = `${rubber.games_won_a} – ${rubber.games_won_b}`;
+	const displayedSides: Side[] = sidesSwapped ? ["b", "a"] : ["a", "b"];
+	const gameScore = (game: Game) =>
+		sidesSwapped
+			? `${game.score_b}–${game.score_a}`
+			: `${game.score_a}–${game.score_b}`;
 	const backLink =
 		backTo === "referee" ? (
 			<Link to="/r/$token" params={{ token: token ?? "" }} />
@@ -383,7 +393,12 @@ export function RubberScoringScreen({
 								? "Không thi đấu"
 								: "Sắp diễn ra"}
 				</Badge>
-				<span className="text-sm font-mono">Số game: {gamesWon}</span>
+				<span className="text-sm font-mono">
+					Số game:{" "}
+					{rubber.status === "live" && sidesSwapped
+						? `${rubber.games_won_b} – ${rubber.games_won_a}`
+						: gamesWon}
+				</span>
 			</div>
 			{rubber.status === "scheduled" && (
 				<Card className="space-y-4 p-5">
@@ -423,55 +438,55 @@ export function RubberScoringScreen({
 					<span className="sr-only" aria-live="polite">
 						{data.teamA} {score.a}, {data.teamB} {score.b}
 					</span>
+					<Button
+						variant="outline"
+						size="touch"
+						className="justify-self-center"
+						aria-pressed={sidesSwapped}
+						onClick={() => setSideOrder({ rubberId, swapped: !sidesSwapped })}
+					>
+						<ArrowLeftRightIcon aria-hidden="true" /> Đổi bên sân
+					</Button>
 					<div className="grid min-h-[38vh] grid-cols-2 gap-3">
-						<ScoreSide
-							side="a"
-							name={data.teamA}
-							players={data.playersA}
-							score={score.a}
-							disabled={!canScore}
-							onClick={() => void act("score", "a")}
-						/>
-						<ScoreSide
-							side="b"
-							name={data.teamB}
-							players={data.playersB}
-							score={score.b}
-							disabled={!canScore}
-							onClick={() => void act("score", "b")}
-						/>
+						{displayedSides.map((side) => (
+							<ScoreSide
+								key={side}
+								side={side}
+								name={side === "a" ? data.teamA : data.teamB}
+								players={side === "a" ? data.playersA : data.playersB}
+								score={score[side]}
+								disabled={!canScore}
+								onClick={() => void act("score", side)}
+							/>
+						))}
 					</div>
 					<div className="flex flex-wrap justify-center gap-2 text-xs text-muted-foreground">
 						{data.games
 							.filter((game) => game.winner_side)
 							.map((game) => (
 								<span key={game.id}>
-									Ván {game.game_no}: {game.score_a}–{game.score_b}
+									Ván {game.game_no}: {gameScore(game)}
 								</span>
 							))}
 						{currentGame && (
 							<span className="font-semibold text-foreground">
-								Ván {currentGame.game_no}: {score.a}–{score.b}
+								Ván {currentGame.game_no}: {score[displayedSides[0]]}–
+								{score[displayedSides[1]]}
 							</span>
 						)}
 					</div>
 					<div className="grid grid-cols-2 gap-3">
-						<Button
-							size="xl"
-							variant="outline"
-							disabled={!canScore || score.a === 0}
-							onClick={() => void act("undo", "a")}
-						>
-							Hoàn tác điểm A
-						</Button>
-						<Button
-							size="xl"
-							variant="outline"
-							disabled={!canScore || score.b === 0}
-							onClick={() => void act("undo", "b")}
-						>
-							Hoàn tác điểm B
-						</Button>
+						{displayedSides.map((side) => (
+							<Button
+								key={side}
+								size="xl"
+								variant="outline"
+								disabled={!canScore || score[side] === 0}
+								onClick={() => void act("undo", side)}
+							>
+								Hoàn tác điểm {side.toUpperCase()}
+							</Button>
+						))}
 					</div>
 					<Button
 						variant="destructive"
