@@ -776,6 +776,19 @@ function RubberAdminCard({
 
 				{/* Điểm ván & Hành động */}
 				<div className="flex items-center gap-2">
+					<Button
+						variant="outline"
+						size="xs"
+						render={
+							<Link
+								to="/admin/tournaments/$id/rubbers/$rubberId"
+								params={{ id: tournamentId, rubberId: rubber.id }}
+							/>
+						}
+						className="text-[11px] h-6"
+					>
+						{rubber.status === "live" ? "Chấm tiếp" : "Chấm điểm"}
+					</Button>
 					{rubber.status !== "scheduled" && (
 						<span className="font-mono text-xs font-bold text-foreground bg-background px-2 py-0.5 border border-border">
 							{rubber.games_won_a} – {rubber.games_won_b}

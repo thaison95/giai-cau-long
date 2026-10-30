@@ -207,30 +207,30 @@ M0 và M1 làm song song được (UI và database độc lập).
 
 ---
 
-## M4 — Chấm điểm
+## M4 — Chấm điểm — ✅ Hoàn thành
 
 > Phụ thuộc chung: M1-5, M1-6, M2-7, M2-8.
 
-### M4-1 Trang trọng tài `/r/$token` (M)
+### M4-1 Trang trọng tài `/r/$token` (M) — ✅ Hoàn thành
 - **Việc:** gọi `referee_whoami`; chào tên; danh sách rubber được giao, rubber `live` đứng đầu; token sai hoặc giải đã kết thúc hiện "Link không còn hiệu lực".
 - **Nghiệm thu:** trọng tài chỉ thấy rubber của mình; token không bị ghi vào log hay gửi đi nơi khác ngoài RPC.
 
-### M4-2 Màn chấm điểm (L)
+### M4-2 Màn chấm điểm (L) — ✅ Hoàn thành
 - **Phụ thuộc:** M4-1.
 - **Việc:** `/r/$token/rubbers/$rubberId` theo đặc tả 02 §5: hai vùng điểm lớn chạm được, chuỗi điểm game, 2 nút hoàn tác, trạng thái `scheduled`/`live`/`finished`, nút "Bắt đầu trận" bị khóa kèm lý do khi thiếu đội hình hoặc đội; hiển thị rõ nhãn loại trận (Đơn, Đôi, Đôi nam nữ); hỗ trợ cả thể thức 1 set 21 điểm (`rule_games_to_win = 1`) và best-of-3 (`rule_games_to_win = 2`); gọi `start_rubber`, `score_point`, `undo_point`.
 - **Nghiệm thu:** ở thể thức 1 set 21 điểm, chạm điểm kết thúc (ví dụ 21–18 hoặc 30–29) thì rubber tự động chuyển thành `finished` ngay lập tức không có ván 2; ở thể thức best-of-3 chấm đủ 2–0 và 2–1; game kết thúc đúng công thức; rubber tự kết thúc.
 
-### M4-3 Hành vi nâng cao của màn chấm điểm (M)
+### M4-3 Hành vi nâng cao của màn chấm điểm (M) — ✅ Hoàn thành
 - **Phụ thuộc:** M4-2.
 - **Việc:** cập nhật lạc quan và hoàn lại khi RPC lỗi; chống chạm đúp 250ms; rung `navigator.vibrate(15)`; `wakeLock` khi live; banner 3 giây khi hết game; cảnh báo và chặn chạm khi chắc chắn offline.
-- **Nghiệm thu:** thử trên điện thoại thật; ngắt mạng thì hiện cảnh báo và không cho chấm.
+- **Nghiệm thu:** ngắt mạng thì hiện cảnh báo và không cho chấm. Kiểm thử viewport 360px bằng CloakBrowser; người dùng đồng ý bỏ qua tiêu chí thử trên điện thoại thật.
 
-### M4-4 Kết thúc sớm và xử thua (S)
+### M4-4 Kết thúc sớm và xử thua (S) — ✅ Hoàn thành
 - **Phụ thuộc:** M4-2.
 - **Việc:** nút "Kết thúc sớm" mở `alert-dialog` chọn phía thắng, gọi `end_rubber_early`; trang quản trị có nút xử thua `end_rubber_walkover` cho rubber `scheduled`.
 - **Nghiệm thu:** tie vẫn kết thúc đúng khi có rubber kết thúc sớm hoặc xử thua.
 
-### M4-5 Ban tổ chức chấm thay và can thiệp (S)
+### M4-5 Ban tổ chức chấm thay và can thiệp (S) — ✅ Hoàn thành
 - **Phụ thuộc:** M4-2, M2-8.
 - **Việc:** từ trang tie ở khu quản trị mở màn chấm điểm dùng chung, không cần token; chấm được mọi rubber dù chưa gán trọng tài; nút "Mở lại trận đấu" gọi `reopen_finished_rubber` để khôi phục rubber về `live` và lùi 1 điểm nếu trọng tài lỡ tay bấm nhầm điểm 21 ở thể thức 1 set.
 - **Nghiệm thu:** organizer chấm được rubber chưa gán; mở lại được rubber `finished` để sửa điểm; người không phải organizer và không có token bị `forbidden`.

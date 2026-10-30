@@ -41,6 +41,14 @@ begin
  perform public.end_rubber_walkover((select id from public.rubbers where tie_id=ti and position=3),'a');
  if not exists(select 1 from public.ties where id=ti and status='finished' and winner_team_id=ta) or exists(select 1 from public.rubbers where tie_id=ti and status='scheduled') then raise exception 'tie did not finish and skip remaining rubbers'; end if;
  if not exists(select 1 from public.group_standings where group_id=gi and team_id=ta and played=1 and won=1 and points=1 and rubbers_for=3 and rubbers_against=0) then raise exception 'group standings did not calculate tie totals'; end if;
+ perform public.reopen_finished_rubber(ri);
+ if not exists(select 1 from public.rubbers where id=ri and status='live' and games_won_a=1 and games_won_b=1 and winner_side is null) then raise exception 'reopen did not roll back the final point and game win'; end if;
+ if not exists(select 1 from public.games where rubber_id=ri and game_no=3 and winner_side is null) then raise exception 'reopen did not clear final game winner'; end if;
+ if (select count(*) from public.rubbers where tie_id=ti and status='scheduled')<>2 or (select status from public.ties where id=ti)<>'live' then raise exception 'reopen did not restore skipped rubbers and live tie'; end if;
+ begin perform public.reopen_finished_rubber((select id from public.rubbers where tie_id=ti and position=2)); raise exception 'walkover unexpectedly reopened'; exception when others then if sqlerrm<>'rubber_not_reopenable' then raise; end if; end;
+ perform set_config('request.jwt.claim.sub',uid2::text,true);
+ begin perform public.reopen_finished_rubber(ri); raise exception 'non-organizer unexpectedly reopened rubber'; exception when others then if sqlerrm<>'forbidden' then raise; end if; end;
+ perform set_config('request.jwt.claim.sub',uid::text,true);
  insert into public.ties(tournament_id,stage,round_label,team_a_id,team_b_id) values(tid,'group','Cap test',ta,tb) returning id into cap_ti;
  select id into cap_ri from public.rubbers where tie_id=cap_ti and position=1;
  update public.rubbers set referee_id=refid where id=cap_ri;

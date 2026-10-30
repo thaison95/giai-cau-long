@@ -24,12 +24,6 @@ export default function Header() {
 				</Link>
 				<div className="ml-auto flex items-center gap-3 text-sm">
 					<Link
-						to="/r"
-						className="text-muted-foreground hover:text-foreground transition-colors font-medium text-xs md:text-sm"
-					>
-						Trọng tài
-					</Link>
-					<Link
 						to="/admin"
 						className="text-muted-foreground hover:text-foreground transition-colors font-medium text-xs md:text-sm"
 					>

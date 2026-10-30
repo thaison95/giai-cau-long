@@ -150,8 +150,6 @@ function TournamentPublicPage() {
 			.filter((t): t is Team => Boolean(t));
 	}, [standings, teamMap]);
 
-	const isFinished = tournament.status === "finished";
-
 	const dateText = React.useMemo(() => {
 		if (tournament.start_date && tournament.end_date) {
 			if (tournament.start_date === tournament.end_date) {
